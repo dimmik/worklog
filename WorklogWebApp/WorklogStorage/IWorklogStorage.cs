@@ -8,5 +8,6 @@ namespace WorklogStorage
     public interface IWorklogStorage
     {
         Notebook GetNotebook(string id);
+        void StoreNotebook(Notebook nb);
     }
 }
