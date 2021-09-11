@@ -1,0 +1,94 @@
+[
+  {
+    "Id": "n1Id",
+    "SecretMd5": null,
+    "Name": "Notebook test inmem 1",
+    "Recods": [
+      {
+        "Id": "2ccfb1d2-bb3c-423c-9f89-426bbaf01d8f",
+        "Timestamp": "2021-09-11T13:51:39.1300104+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [
+            "first",
+            "test",
+            "fun"
+          ]
+        },
+        "Content": "Notebook 1 Record 1"
+      },
+      {
+        "Id": "94c579b5-b66f-470f-898f-aacfa128aab9",
+        "Timestamp": "2021-09-11T13:51:39.1389953+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [
+            "second",
+            "test",
+            "fun"
+          ]
+        },
+        "Content": "Notebook 1 Record 2"
+      },
+      {
+        "Id": "d84f4b23-2614-4048-9897-5164ea52a34f",
+        "Timestamp": "2021-09-11T13:51:39.1390014+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [
+            "third",
+            "test",
+            "fun"
+          ]
+        },
+        "Content": "Notebook 1 Record 3"
+      }
+    ]
+  },
+  {
+    "Id": "n2Id",
+    "SecretMd5": null,
+    "Name": "Notebook test inmem 1",
+    "Recods": [
+      {
+        "Id": "34fde16e-4c7b-4af3-a6a6-c2304328b1fa",
+        "Timestamp": "2021-09-11T13:51:39.1390605+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [
+            "first",
+            "test",
+            "fun"
+          ]
+        },
+        "Content": "Notebook 2 Record 1"
+      },
+      {
+        "Id": "c7225a95-2a3b-4b28-a70c-fe1bd3a6e440",
+        "Timestamp": "2021-09-11T13:51:39.139062+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [
+            "second",
+            "test",
+            "fun"
+          ]
+        },
+        "Content": "Notebook 2 Record 2"
+      },
+      {
+        "Id": "18ee05ba-81c9-4ab9-aba1-40403ce22742",
+        "Timestamp": "2021-09-11T13:51:39.1390626+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [
+            "third",
+            "test",
+            "fun"
+          ]
+        },
+        "Content": "Notebook 2 Record 3"
+      }
+    ]
+  }
+]
