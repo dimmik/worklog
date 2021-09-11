@@ -9,5 +9,6 @@ namespace WorklogStorage
     {
         Notebook GetNotebook(string id);
         void StoreNotebook(Notebook nb);
+        IEnumerable<Notebook> GetNotebooks(string namespaceMd5);
     }
 }

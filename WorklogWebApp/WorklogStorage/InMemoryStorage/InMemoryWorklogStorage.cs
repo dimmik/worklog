@@ -18,6 +18,13 @@ namespace WorklogStorage.InMemoryStorage
             return Notebooks.FirstOrDefault(n => n.Id == id);
         }
 
+        public IEnumerable<Notebook> GetNotebooks(string namespaceMd5)
+        {
+            return string.IsNullOrWhiteSpace(namespaceMd5) 
+                ? Notebooks 
+                : Notebooks.Where(n => n.NamespaceMd5 == namespaceMd5);
+        }
+
         public void StoreNotebook(Notebook nb)
         {
             if (Notebooks.Exists(n => n.Id == nb.Id))

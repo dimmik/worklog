@@ -8,7 +8,7 @@ namespace WorklogDomain
     {
         public string Id { get; set; }
         public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
-        public string SecretMd5 { get; set; }
+        public string NamespaceMd5 { get; set; }
         public string Name { get; set; }
         public IEnumerable<Record> Recods { get; set; }
 

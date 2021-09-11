@@ -32,7 +32,7 @@ namespace ConsoleTest
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Notebook test inmem 1",
-                    SecretMd5 = null,
+                    NamespaceMd5 = "d7d3dcd12db9be367089dd914a41f820", // test-notebooks
                     Recods = new[] {
                         new Record()
                         {
@@ -73,7 +73,7 @@ namespace ConsoleTest
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Notebook test inmem 1",
-                    SecretMd5 = null,
+                    NamespaceMd5 = "d7d3dcd12db9be367089dd914a41f820", // test-notebooks,
                     Recods = new[] {
                         new Record()
                         {
