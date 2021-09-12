@@ -6,10 +6,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using WorklogDomain;
+using WorklogStorage;
+using WorklogStorage.InMemoryStorage;
 
 namespace WorklogWebApp
 {
@@ -25,6 +30,10 @@ namespace WorklogWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IWorklogStorage imMemStorage = new InMemoryWorklogStorage(
+                JsonConvert.DeserializeObject<Notebook[]>(File.ReadAllText("./test-inmem-nbs.json"))
+                );
+            services.AddSingleton(imMemStorage);
             services.AddControllers();
         }
 

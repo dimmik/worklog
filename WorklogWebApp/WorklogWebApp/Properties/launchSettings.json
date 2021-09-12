@@ -19,8 +19,9 @@
     },
     "WorklogWebApp": {
       "commandName": "Project",
+      "workingDirectory": ".",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
+      "launchUrl": "api/notebook/list",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

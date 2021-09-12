@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace WorklogBlazorWebassembly
 {
-    public class Program
+    public class BlazorMain
     {
         public static async Task Main(string[] args)
         {
