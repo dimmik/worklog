@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using WorklogDomain;
 using WorklogStorage;
@@ -33,7 +34,7 @@ namespace ConsoleTest
                     Id = Guid.NewGuid().ToString(),
                     Name = "Notebook test inmem 1",
                     NamespaceMd5 = "d7d3dcd12db9be367089dd914a41f820", // test-notebooks
-                    Records = new[] {
+                    Records = new List<Record>() {
                         new Record()
                         {
                             Id = Guid.NewGuid().ToString(),
@@ -74,7 +75,7 @@ namespace ConsoleTest
                     Id = Guid.NewGuid().ToString(),
                     Name = "Notebook test inmem 1",
                     NamespaceMd5 = "d7d3dcd12db9be367089dd914a41f820", // test-notebooks,
-                    Records = new[] {
+                    Records = new List<Record> {
                         new Record()
                         {
                             Id = Guid.NewGuid().ToString(),

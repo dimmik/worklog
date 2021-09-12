@@ -40,9 +40,10 @@ namespace WorklogWebApp.Controllers
         }
 
         // POST api/<NoebookController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("add")]
+        public void Post([FromBody] Notebook nb)
         {
+            Storage.AddNotebook(nb);
         }
 
         // PUT api/<NoebookController>/5

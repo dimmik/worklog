@@ -26,19 +26,44 @@ else
                 <tr>
                     <td>@notebook.Name</td>
                     <td>@notebook.Created.ToString("dd.MM.yyyy HH:mm:ss")</td>
-                    <td>@notebook.Records.Count()</td>
-                </tr>
+                    <td>@(notebook.Records?.Count() ?? 0)
+                    </td>
+
+
+                 </tr>
             }
+            <tr>
+                <td colspan="3">
+
+                    <EditForm Model="@newNotebook" OnValidSubmit="@AddNotebook">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <InputText id="name" @bind-Value="newNotebook.Name" />
+
+                        <button type="submit">Submit</button>
+                    </EditForm>
+
+                </td>
+            </tr>
         </tbody>
     </table>
 }
 
 @code {
     private Notebook[] notebooks;
+    private Notebook newNotebook = new();
 
     protected override async Task OnInitializedAsync()
     {
         notebooks = await Http.GetFromJsonAsync<Notebook[]>("api/notebook/list");
+    }
+    protected async Task AddNotebook()
+    {
+        await Http.PostAsJsonAsync<Notebook>("api/notebook/add", newNotebook);
+        newNotebook = new();
+        notebooks = await Http.GetFromJsonAsync<Notebook[]>("api/notebook/list");
+        StateHasChanged();
     }
 
 

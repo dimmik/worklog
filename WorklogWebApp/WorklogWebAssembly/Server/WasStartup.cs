@@ -43,6 +43,7 @@ namespace WorklogWebAssembly.Server
             {
                 app.UseDeveloperExceptionPage();
                 app.UseWebAssemblyDebugging();
+                
             }
             else
             {
