@@ -4,7 +4,7 @@
     "Created": "2021-09-11T15:30:45.4507493+03:00",
     "NamespaceMd5": "d7d3dcd12db9be367089dd914a41f820",
     "Name": "Notebook test inmem 1",
-    "Recods": [
+    "Records": [
       {
         "Id": "2361a0ab-03c9-4408-8c60-f171ba1d2456",
         "Timestamp": "2021-09-11T15:30:45.4571696+03:00",
@@ -51,7 +51,7 @@
     "Created": "2021-09-11T15:30:45.4577939+03:00",
     "NamespaceMd5": "d7d3dcd12db9be367089dd914a41f820",
     "Name": "Notebook test inmem 1",
-    "Recods": [
+    "Records": [
       {
         "Id": "ff8ed25d-68f6-470b-9fca-262dac182b1f",
         "Timestamp": "2021-09-11T15:30:45.4577965+03:00",

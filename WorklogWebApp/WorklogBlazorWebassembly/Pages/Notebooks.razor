@@ -1,0 +1,45 @@
+﻿@page "/notebooks"
+@using WorklogDomain
+@inject HttpClient Http
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (notebooks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Cont recs</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var notebook in notebooks)
+            {
+                <tr>
+                    <td>@notebook.Name</td>
+                    <td>@notebook.Created.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                    <td>@notebook.Records.Count()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Notebook[] notebooks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        notebooks = await Http.GetFromJsonAsync<Notebook[]>("api/notebook/list");
+    }
+
+
+}
