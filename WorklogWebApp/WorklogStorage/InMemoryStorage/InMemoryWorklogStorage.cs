@@ -13,6 +13,16 @@ namespace WorklogStorage.InMemoryStorage
         {
             Notebooks = notebooks.ToList();
         }
+
+        public void AddNotebook(Notebook nb)
+        {
+            if (Notebooks.Exists(n => n.Id == nb.Id))
+            {
+                Notebooks.RemoveAll(n => n.Id == nb.Id);
+            }
+            Notebooks.Add(nb);
+        }
+
         public Notebook GetNotebook(string id)
         {
             return Notebooks.FirstOrDefault(n => n.Id == id);
@@ -23,6 +33,11 @@ namespace WorklogStorage.InMemoryStorage
             return string.IsNullOrWhiteSpace(namespaceMd5) 
                 ? Notebooks 
                 : Notebooks.Where(n => n.NamespaceMd5 == namespaceMd5);
+        }
+
+        public void RemoveNotebook(string id)
+        {
+            Notebooks.RemoveAll(n => n.Id == id);
         }
 
         public void StoreNotebook(Notebook nb)
