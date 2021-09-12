@@ -25,36 +25,29 @@ namespace WorklogWebApp.Controllers
             Log = logger;
             Storage = storage;
         }
-        // GET: api/<NoebookController>
-        [HttpGet("list")]
+        [HttpGet]
         public IEnumerable<Notebook> Get()
         {
             return Storage.GetNotebooks(null);
         }
 
-        // GET api/<NoebookController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Notebook Get(string id)
         {
-            return "value";
+            return Storage.GetNotebook(id);
         }
 
-        // POST api/<NoebookController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Notebook nb)
         {
+            Storage.AddNotebook(nb);
         }
 
-        // PUT api/<NoebookController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
 
-        // DELETE api/<NoebookController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(string id)
         {
+            Storage.RemoveNotebook(id);
         }
     }
 }

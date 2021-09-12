@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,16 @@ namespace WorklogStorage.InMemoryStorage
         {
             Notebooks = notebooks.ToList();
         }
+
+        public void AddNotebook(Notebook nb)
+        {
+            if (Notebooks.Exists(n => n.Id == nb.Id))
+            {
+                Notebooks.RemoveAll(n => n.Id == nb.Id);
+            }
+            Notebooks.Add(nb);
+        }
+
         public Notebook GetNotebook(string id)
         {
             return Notebooks.FirstOrDefault(n => n.Id == id);
@@ -25,13 +36,16 @@ namespace WorklogStorage.InMemoryStorage
                 : Notebooks.Where(n => n.NamespaceMd5 == namespaceMd5);
         }
 
-        public void StoreNotebook(Notebook nb)
+        public void RemoveNotebook(string id)
         {
-            if (Notebooks.Exists(n => n.Id == nb.Id))
-            {
-                Notebooks.Remove(Notebooks.Where(n => n.Id == nb.Id).First());
-            }
-            Notebooks.Add(nb);
+            Notebooks.RemoveAll(n => n.Id == id);
+        }
+
+        public void UpdateNotebook(string id, Notebook nb)
+        {
+            var clone = JsonConvert.DeserializeObject<Notebook>(JsonConvert.SerializeObject(nb));
+            clone.Id = id;
+            AddNotebook(clone);
         }
     }
 }
