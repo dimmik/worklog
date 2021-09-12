@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WorklogWebApp
 {
-    public class Program
+    public class WebAppMain
     {
         public static void Main(string[] args)
         {
