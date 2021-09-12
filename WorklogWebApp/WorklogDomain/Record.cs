@@ -5,10 +5,10 @@ namespace WorklogDomain
 {
     public class Record : IEquatable<Record>
     {
-        public string Id { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
-        public RecordMetadata Metadata { get; set; }
-        public string Content { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString("N");
+        public DateTimeOffset Timestamp { get; set; } = DateTime.Now;
+        public RecordMetadata Metadata { get; set; } = new RecordMetadata();
+        public string Content { get; set; } = "";
 
         public override bool Equals(object obj)
         {
