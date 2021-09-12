@@ -27,6 +27,8 @@ else
                     <td>@notebook.Name</td>
                     <td>@notebook.Created.ToString("dd.MM.yyyy HH:mm:ss")</td>
                     <td>@(notebook.Records?.Count() ?? 0)
+
+                    <button @onclick="() => RemoveNotebook(notebook.Id)">Remove</button>
                     </td>
 
 
@@ -56,15 +58,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        notebooks = await Http.GetFromJsonAsync<Notebook[]>("api/notebook/list");
+        await ReloadNotebooks();
+    }
+    protected async Task ReloadNotebooks()
+    {
+        notebooks = await Http.GetFromJsonAsync<Notebook[]>("api/notebook");
     }
     protected async Task AddNotebook()
     {
-        await Http.PostAsJsonAsync<Notebook>("api/notebook/add", newNotebook);
+        await Http.PostAsJsonAsync<Notebook>("api/notebook", newNotebook);
         newNotebook = new();
-        notebooks = await Http.GetFromJsonAsync<Notebook[]>("api/notebook/list");
-        StateHasChanged();
+        await ReloadNotebooks();
     }
-
-
+    protected async Task RemoveNotebook(string id)
+    {
+        await Http.DeleteAsync($"api/notebook/{id}");
+        await ReloadNotebooks();
+    }
 }
