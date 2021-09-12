@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>WorklogBlazorWebassembly</ActiveDebugProfile>
+    <ActiveDebugProfile>WorklogWebAssembly.Server</ActiveDebugProfile>
   </PropertyGroup>
 </Project>

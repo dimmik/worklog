@@ -8,9 +8,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorklogBlazorWebassembly
+namespace WorklogWebAssembly.Client
 {
-    public class BlazorMain
+    public class WasClientMain
     {
         public static async Task Main(string[] args)
         {
