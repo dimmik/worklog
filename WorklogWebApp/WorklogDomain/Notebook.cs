@@ -10,7 +10,7 @@ namespace WorklogDomain
         public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
         public string NamespaceMd5 { get; set; }
         public string Name { get; set; }
-        public IEnumerable<Record> Recods { get; set; }
+        public IEnumerable<Record> Records { get; set; }
 
         public override bool Equals(object obj)
         {

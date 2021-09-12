@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:63434",
+      "applicationUrl": "http://localhost:54422",
       "sslPort": 44311
     }
   },
@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WorklogBlazorWebassembly": {
+    "WorklogWebAssembly": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,
