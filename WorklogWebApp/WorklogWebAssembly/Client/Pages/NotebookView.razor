@@ -1,6 +1,7 @@
 ﻿@page "/notebooks/{nbId}"
 @using WorklogDomain
 @inject HttpClient Http
+@inject AppState AppState
 
 @if (notebook == null)
 {
@@ -9,7 +10,7 @@
 {
   <ol>
       <li>Name: @notebook.Name</li>
-      <li>Records <input type="text" @bind-value="NumLastRecords"/>:
+      <li>Records <input type="text" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))"/>:
           <ol>
               @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
               {
@@ -34,20 +35,30 @@
 }
 
 @code {
-    [Parameter]
-    public string NbId { get; set; }
+        [Parameter]
+        public string NbId { get; set; }
     protected Notebook notebook { get; set; }
-    protected int NumLastRecords { get; set; } = 150; // TODO get from cookies
+    protected int NumLastRecords { get; set; }
 
     protected Record NewRecord = new();
 
     protected override async Task OnInitializedAsync()
     {
         await ReloadNotebook();
+        NumLastRecords = await AppState.Retrieve<int>(nameof(NumLastRecords));
+        if (NumLastRecords == 0) NumLastRecords = 100;
     }
     protected async Task ReloadNotebook()
     {
         notebook = await Http.GetFromJsonAsync<Notebook>($"api/notebook/{NbId}");
+    }
+    protected async Task ChangedNumLastRecords(string numS)
+    {
+        if (int.TryParse(numS, out int num))
+        {
+            NumLastRecords = num;
+            await AppState.Store(nameof(NumLastRecords), NumLastRecords);
+        }
     }
     protected async Task AddRecord()
     {
