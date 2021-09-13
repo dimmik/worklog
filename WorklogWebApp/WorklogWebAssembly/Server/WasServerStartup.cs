@@ -14,6 +14,7 @@ using WorklogDomain;
 using WorklogStorage;
 using WorklogStorage.InMemoryStorage;
 using WorklogStorage.MongoDb;
+using WorklogWebApp.Exceptions;
 
 namespace WorklogWebAssembly.Server
 {
@@ -68,6 +69,8 @@ namespace WorklogWebAssembly.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseMiddleware<HttpExceptionMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();

@@ -16,9 +16,5 @@
     <ProjectReference Include="..\Shared\WorklogWebAssembly.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Auth\" />
-  </ItemGroup>
-
 
 </Project>

@@ -1,17 +1,41 @@
 ﻿@inherits LayoutComponentBase
+@using WorklogDomain
+@inject HttpClient Http
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+@if (AuthData == null)
+{
+    <p>Checking Auth ...</p>
+}
+else if (!AuthData.IsAuthorized)
+{
+    <p>Please Auth <input type="text" @onchange="@((ChangeEventArgs __e) => Authorize(__e.Value.ToString()))"/></p>
+}
+else
+{
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
         </div>
 
-        <div class="content px-4">
-            @Body
+        <div class="main">
+            <div class="content px-4">
+                @Body
+            </div>
         </div>
     </div>
-</div>
+}
+@code {
+    protected AuthData AuthData;
+    protected string Namespace = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+    }
+    protected async Task Authorize(string auth)
+    {
+        await Http.PostAsJsonAsync("api/auth", auth);
+        AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+    }
+}
