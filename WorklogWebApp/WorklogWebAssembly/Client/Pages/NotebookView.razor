@@ -1,0 +1,64 @@
+﻿@page "/notebooks/{nbId}"
+@using WorklogDomain
+@inject HttpClient Http
+
+@if (notebook == null)
+{
+  <p>Loading ...</p>
+} else
+{
+  <ol>
+      <li>Name: @notebook.Name</li>
+      <li>Records <input type="text" @bind-value="NumLastRecords"/>:
+          <ol>
+              @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
+              {
+                  <li>Record at @r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"): @r.Content
+              <button @onclick="() => RemoveRecord(r.Id)">Remove</button>
+                </li>
+              }
+          <li>
+              <EditForm Model="@NewRecord" OnValidSubmit="@AddRecord">
+                  <DataAnnotationsValidator />
+                  <ValidationSummary />
+
+                  New: <InputText id="name" @bind-Value="NewRecord.Content" />
+
+                  <button type="submit">Add</button>
+              </EditForm>
+
+          </li>
+          </ol>
+      </li>
+  </ol>
+}
+
+@code {
+    [Parameter]
+    public string NbId { get; set; }
+    protected Notebook notebook { get; set; }
+    protected int NumLastRecords { get; set; } = 150; // TODO get from cookies
+
+    protected Record NewRecord = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadNotebook();
+    }
+    protected async Task ReloadNotebook()
+    {
+        notebook = await Http.GetFromJsonAsync<Notebook>($"api/notebook/{NbId}");
+    }
+    protected async Task AddRecord()
+    {
+        NewRecord.Timestamp = DateTimeOffset.Now;
+        await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", NewRecord);
+        NewRecord = new();
+        await ReloadNotebook();
+    }
+    protected async Task RemoveRecord(string recId)
+    {
+        await Http.DeleteAsync($"api/notebook/{NbId}/record/{recId}");
+        await ReloadNotebook();
+    }
+}

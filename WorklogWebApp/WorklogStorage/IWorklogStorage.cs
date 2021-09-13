@@ -12,5 +12,8 @@ namespace WorklogStorage
         void RemoveNotebook(string id);
         void AddNotebook(Notebook nb);
         void UpdateNotebook(string id, Notebook nb);
+        void AddRecord(string nbId, Record rec);
+        void RemoveRecord(string nbId, string recId);
+        void UpdateRecord(string nbId, string recId, Record rec);
     }
 }

@@ -2,9 +2,9 @@
 @using WorklogDomain
 @inject HttpClient Http
 
-<h1>Weather forecast</h1>
+<h1>Notebook List</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+
 
 @if (notebooks == null)
 {
@@ -24,7 +24,7 @@ else
             @foreach (var notebook in notebooks)
             {
                 <tr>
-                    <td>@notebook.Name</td>
+                    <td><a href="/notebooks/@notebook.Id">@notebook.Name</a></td>
                     <td>@notebook.Created.ToString("dd.MM.yyyy HH:mm:ss")</td>
                     <td>@(notebook.Records?.Count() ?? 0)
 
