@@ -5,33 +5,35 @@
 
 @if (notebook == null)
 {
-  <p>Loading ...</p>
+  <p>Loading Notebook...</p>
 } else
 {
-  <ol>
-      <li>Name: @notebook.Name</li>
-      <li>Records <input type="text" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))"/>:
-          <ol>
-              @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
-              {
-                  <li>Record at @r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"): @r.Content
-              <button @onclick="() => RemoveRecord(r.Id)">Remove</button>
-                </li>
-              }
-          <li>
-              <EditForm Model="@NewRecord" OnValidSubmit="@AddRecord">
-                  <DataAnnotationsValidator />
-                  <ValidationSummary />
 
-                  New: <InputText id="name" @bind-Value="NewRecord.Content" />
-
-                  <button type="submit">Add</button>
-              </EditForm>
-
-          </li>
-          </ol>
-      </li>
-  </ol>
+<table width="100%" border="1">
+    <tr>
+        <td colspan="2">
+            @notebook.Name [@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]
+            Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" /> last records
+        </td>
+    </tr>
+    @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
+    {
+        <tr>
+            <td width="5%" valign="top"><span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr></span></td>
+            <td><pre>@r.Content</pre></td>
+        </tr>
+    }
+<tr>
+    <td colspan="2">
+            <textarea id="NewRecordName" style="width: 100%" 
+                      @bind="NewRecordContent"
+                      @bind:event="oninput"
+                      @onkeydown="(KeyboardEventArgs e) => AddRecordByEnter(e)"
+                      />
+            <button @onclick="AddRecord">Add</button>
+    </td>
+</tr>
+</table>
 }
 
 @code {
@@ -40,7 +42,7 @@
     protected Notebook notebook { get; set; }
     protected int NumLastRecords { get; set; }
 
-    protected Record NewRecord = new();
+    protected string NewRecordContent = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,11 +62,19 @@
             await AppState.Store(nameof(NumLastRecords), NumLastRecords);
         }
     }
+    protected async Task AddRecordByEnter(KeyboardEventArgs e)
+    {
+        if ((e.Code == "Enter" || e.Code == "NumpadEnter") && !(e.AltKey || e.ShiftKey || e.CtrlKey))
+        {
+            await AddRecord();
+        }
+    }
     protected async Task AddRecord()
     {
-        NewRecord.Timestamp = DateTimeOffset.Now;
-        await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", NewRecord);
-        NewRecord = new();
+        var rec = new Record();
+        rec.Content = NewRecordContent;
+        await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", rec);
+        NewRecordContent = "";
         await ReloadNotebook();
     }
     protected async Task RemoveRecord(string recId)
