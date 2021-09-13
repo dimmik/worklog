@@ -27,9 +27,7 @@ namespace WorklogWebAssembly.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            IWorklogStorage imMemStorage = new InMemoryWorklogStorage(
-                JsonConvert.DeserializeObject<Notebook[]>(File.ReadAllText("./test-inmem-nbs.json"))
-                );
+            IWorklogStorage imMemStorage = new PersistentLocalStorage("./test-inmem-nbs.json");
             services.AddSingleton(imMemStorage);
             services.AddControllers();
             services.AddControllersWithViews();

@@ -43,6 +43,24 @@
           ]
         },
         "Content": "Notebook 1 Record 3"
+      },
+      {
+        "Id": "724cabfad01b402487e8053176505ebd",
+        "Timestamp": "2021-09-13T17:01:44.688+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": null
+        },
+        "Content": "Ченить там добавляем"
+      },
+      {
+        "Id": "ba60d75d4df242cd8b2385feea72b642",
+        "Timestamp": "2021-09-13T17:02:18.611+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": null
+        },
+        "Content": "опять добавляем\nи еще строчку.\nвроде ок"
       }
     ]
   },
