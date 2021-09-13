@@ -5,11 +5,23 @@
 
 @if (AuthData == null)
 {
-    <p>Checking Auth ...</p>
+    <div class="page">
+        <div class="main">
+            <div class="content px-4">
+        <p>Checking Auth ...</p>
+                </div>
+            </div>
+    </div>
 }
 else if (!AuthData.IsAuthorized)
 {
+        <div class="page">
+            <div class="main">
+            <div class="content px-4">
     <p>Please Auth <input type="text" @onchange="@((ChangeEventArgs __e) => Authorize(__e.Value.ToString()))"/></p>
+            </div>
+                </div>
+            </div>
 }
 else
 {
