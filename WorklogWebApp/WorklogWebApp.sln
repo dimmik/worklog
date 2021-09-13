@@ -11,11 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{E8E9AFE0-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{12B0F686-E9D8-49C7-BBA1-4E22235AAF58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorklogWebAssembly.Server", "WorklogWebAssembly\Server\WorklogWebAssembly.Server.csproj", "{BEA961BF-2893-40D6-B7CB-B15250003998}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorklogWebAssembly.Server", "WorklogWebAssembly\Server\WorklogWebAssembly.Server.csproj", "{BEA961BF-2893-40D6-B7CB-B15250003998}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorklogWebAssembly.Client", "WorklogWebAssembly\Client\WorklogWebAssembly.Client.csproj", "{D77337AE-AC45-43D4-B7A0-A3EBC9520E67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorklogWebAssembly.Client", "WorklogWebAssembly\Client\WorklogWebAssembly.Client.csproj", "{D77337AE-AC45-43D4-B7A0-A3EBC9520E67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorklogWebAssembly.Shared", "WorklogWebAssembly\Shared\WorklogWebAssembly.Shared.csproj", "{A5272F84-E0CC-4F3A-B460-79D18E90097F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorklogWebAssembly.Shared", "WorklogWebAssembly\Shared\WorklogWebAssembly.Shared.csproj", "{A5272F84-E0CC-4F3A-B460-79D18E90097F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{ABC464C8-DDE3-489E-BF5C-86D4CE1AB0EC}"
 EndProject
