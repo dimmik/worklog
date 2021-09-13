@@ -50,7 +50,7 @@ namespace WorklogWebAssembly.Server
                 {"mongo", mongoDbStorage}
             };
             var storageType = Configuration.GetValue("StorageType", "local");
-            services.AddSingleton(storages[storageType]());
+            services.AddSingleton(storages.ContainsKey(storageType) ? storages[storageType]() : storages["local"]());        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
