@@ -3,9 +3,12 @@
 @inject HttpClient Http
 @inject AppState AppState
 
-@if (notebook == null)
+@if (notebook == null && !NbNotFound)
 {
   <p>Loading Notebook...</p>
+} else if (NbNotFound)
+{
+    <p>Notebook with ID <pre>@NbId</pre> not found </p>
 } else
 {
 
@@ -19,8 +22,10 @@
     @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
     {
         <tr>
-            <td width="5%" valign="top"><span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr></span></td>
-            <td><pre>@r.Content</pre></td>
+            <td style="width: 5%" valign="top"><span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr></span></td>
+            <td style="width: 95%;">
+                    @((MarkupString)r.Content.Replace("<", "&lt;").Replace("\r\n", "\n").Replace("\n", "<br/>"))
+            </td>
         </tr>
     }
 <tr>
@@ -40,6 +45,7 @@
         [Parameter]
         public string NbId { get; set; }
     protected Notebook notebook { get; set; }
+    protected bool NbNotFound = false;
     protected int NumLastRecords { get; set; }
 
     protected string NewRecordContent = "";
@@ -52,7 +58,14 @@
     }
     protected async Task ReloadNotebook()
     {
-        notebook = await Http.GetFromJsonAsync<Notebook>($"api/notebook/{NbId}");
+        try
+        {
+            notebook = await Http.GetFromJsonAsync<Notebook>($"api/notebook/{NbId}");
+        }
+        catch
+        {
+            NbNotFound = true;
+        }
     }
     protected async Task ChangedNumLastRecords(string numS)
     {
