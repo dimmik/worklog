@@ -2,6 +2,7 @@
 @using WorklogDomain
 @inject HttpClient Http
 @inject AppState AppState
+@inject IJSRuntime jr
 
 @if (notebook == null && !NbNotFound)
 {
@@ -30,11 +31,11 @@
     }
 <tr>
     <td colspan="2">
-            <textarea id="NewRecordName" style="width: 100%" 
+            <textarea id="NewRecordContent" style="width: 100%"
                       @bind="NewRecordContent"
                       @bind:event="oninput"
                       @onkeydown="(KeyboardEventArgs e) => AddRecordByEnter(e)"
-                      />
+                      @ref="NewRecordContentElem" />
             <button @onclick="AddRecord">Add</button>
     </td>
 </tr>
@@ -42,13 +43,15 @@
 }
 
 @code {
-        [Parameter]
-        public string NbId { get; set; }
+    [Parameter]
+    public string NbId { get; set; }
     protected Notebook notebook { get; set; }
     protected bool NbNotFound = false;
     protected int NumLastRecords { get; set; }
 
+
     protected string NewRecordContent = "";
+    private ElementReference NewRecordContentElem;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,6 +92,7 @@
         await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", rec);
         NewRecordContent = "";
         await ReloadNotebook();
+        await NewRecordContentElem.FocusAsync();
     }
     protected async Task RemoveRecord(string recId)
     {
