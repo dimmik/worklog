@@ -20,6 +20,7 @@
     "WorklogWebAssembly.Server": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "notebooks/b4bebcba-c202-4e96-8775-c03c08e4a65f",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
