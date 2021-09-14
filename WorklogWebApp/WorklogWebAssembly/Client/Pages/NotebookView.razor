@@ -2,6 +2,7 @@
 @using WorklogDomain
 @using Algorithms.Encryption
 @using WorklogWebAssembly.Client.Data
+@using System.Text.Json
 @inject HttpClient Http
 @inject AppState AppState
 @inject ISymmetricEncryptor enc
@@ -18,20 +19,28 @@
 <table width="100%" border="1">
     <tr>
         <td colspan="2">
-            <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span><br/>
+            <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span> <span class="button small-btn" @onclick="ReloadNotebook">Refresh</span><br/>
              <span style="font-size:x-small">
-                Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" /> last records
+                Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" /> 
+                 last records out of @((notebook.Records ?? new List<Record>()).Count())
              </span>
 </td>
     </tr>
-    @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
+    @foreach (var r in ((notebook.Records ?? new List<Record>()).OrderBy(r => r.Timestamp).TakeLast(NumLastRecords)))
     {
         var rId = r.Id;
+
         if (!dOpts.ContainsKey(rId)) dOpts[rId] = userSettings.DefaultShowEncryptedOptions.Clone();
+        if (!recs.ContainsKey(rId)) recs[rId] = r;
+
         <tr>
-            <td style="width: 5%" valign="top"><span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr></span></td>
+            <td style="width: 5%" valign="top" align="center">
+                <span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
+                <input type="checkbox" checked="@r.Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }"/>
+                </span>
+            </td>
             <td style="width: 95%">
-                <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word;">
+                <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word; @(r.Metadata.Completed ? "text-decoration: line-through" : "")">
                     @if (!r.Metadata.Encrypted)
                     {
                         @((MarkupString)CleanupAndPrepare(r.Content))
@@ -92,6 +101,7 @@
     private string EncryptionKey;
 
     protected Dictionary<string, ShowEncryptedOptions> dOpts = new Dictionary<string, ShowEncryptedOptions>();
+    protected Dictionary<string, Record> recs = new Dictionary<string, Record>();
 
 
     protected UserSettings userSettings;
@@ -166,6 +176,7 @@
     }
     protected async Task AddRecord()
     {
+        if (string.IsNullOrWhiteSpace(NewRecordContent)) return;
         var rec = new Record();
         if (EncryptContent)
         {
@@ -183,6 +194,14 @@
     protected async Task RemoveRecord(string recId)
     {
         await Http.DeleteAsync($"api/notebook/{NbId}/record/{recId}");
+        await ReloadNotebook();
+    }
+    protected async Task UpdateRecord(Record rec)
+    {
+        var json = JsonSerializer.Serialize(rec);
+        var content = new StringContent(json);
+        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        await Http.PatchAsync($"api/notebook/{NbId}/record/{rec.Id}", content);
         await ReloadNotebook();
     }
 

@@ -72,8 +72,11 @@ namespace WorklogStorage.MongoDb
             var nb = GetNotebook(nbId);
             var clone = JsonConvert.DeserializeObject<Record>(JsonConvert.SerializeObject(rec));
             clone.Id = recId;
-            nb.Records.RemoveAll(r => r.Id == recId);
-            nb.Records.Add(clone);
+            int idx = nb.Records.FindIndex(0, r => r.Id == recId);
+            if (idx >= 0)
+            {
+                nb.Records[idx] = clone;
+            }
             UpdateNotebook(nbId, nb);
         }
 

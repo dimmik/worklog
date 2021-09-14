@@ -28,7 +28,7 @@ namespace WorklogWebAssembly.Client
             {
                 T obj = JsonSerializer.Deserialize<T>(str);
                 return obj;
-            } catch (Exception e)
+            } catch (Exception)
             {
                 return default(T);
             }

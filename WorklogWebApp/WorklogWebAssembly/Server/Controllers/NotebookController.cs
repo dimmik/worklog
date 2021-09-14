@@ -96,6 +96,20 @@ namespace WorklogWebApp.Controllers
 
             Storage.AddRecord(nbId, rec);
         }
+        [HttpPatch("{nbId}/record/{recId}")]
+        public void UpdateRecord([FromRoute] string nbId, [FromRoute] string recId, [FromBody] Record rec)
+        {
+            AuthData authData = GetAuthDataAndThrowIfNotAuthorized();
+            var nb = Storage.GetNotebook(nbId);
+            if (nb == null) return;
+
+            if (!authData.IsAdmin)
+            {
+                if (nb.NamespaceMd5 != authData.NamespaceMd5) throw HttpException.Forbid("You do not have access to this notebook");
+            }
+            rec.Id = recId;
+            Storage.UpdateRecord(nbId, recId, rec);
+        }
         [HttpDelete("{nbId}/record/{recId}")]
         public void RemoveRecord([FromRoute]string nbId, [FromRoute]string recId)
         {
