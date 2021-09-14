@@ -43,8 +43,11 @@ else
                         <DataAnnotationsValidator />
                         <ValidationSummary />
 
-                        name: <InputText id="name" @bind-Value="newNotebook.Name" />
-                        namespace: <InputText id="namespace" @bind-Value="newNotebook.NamespaceMd5" />
+                        Name: <InputText id="name" @bind-Value="newNotebook.Name" />
+                        @if (auth.IsAdmin) 
+                        { 
+                            <span>Namespace: <InputText id="namespace" @bind-Value="newNotebook.NamespaceMd5" /></span>
+                        }
 
                         <button type="submit">Add</button>
                     </EditForm>
@@ -59,9 +62,12 @@ else
     private Notebook[] notebooks;
     private Notebook newNotebook = new();
 
+    protected AuthData auth { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await ReloadNotebooks();
+        auth = await State.Retrieve<AuthData>("authData");
     }
     protected async Task ReloadNotebooks()
     {

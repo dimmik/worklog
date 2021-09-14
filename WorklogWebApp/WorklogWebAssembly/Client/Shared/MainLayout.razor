@@ -2,6 +2,7 @@
 @using WorklogDomain
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime
+@inject AppState appState
 
 
 
@@ -35,18 +36,23 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+        await ReloadAuthData();
     }
     protected async Task Authorize(string auth)
     {
         await Http.PostAsJsonAsync("api/auth", auth);
-        AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+        await ReloadAuthData();
     }
     public async Task Logout()
     {
         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Log out?");
         if (!confirmed) return;
         await Http.GetAsync("api/auth/logout");
+        await ReloadAuthData();
+    }
+    private async Task ReloadAuthData()
+    {
         AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+        await appState.Store("authData", AuthData);
     }
 }

@@ -46,13 +46,22 @@ namespace WorklogWebApp.Controllers
         public Notebook GetNotebook(string id)
         {
             AuthData authData = GetAuthDataAndThrowIfNotAuthorized();
-            return Storage.GetNotebook(id);
+            var nb = Storage.GetNotebook(id);
+            if (!authData.IsAdmin)
+            {
+                if (nb?.NamespaceMd5 != authData.NamespaceMd5) throw HttpException.Forbid("You do not have access to this notebook");
+            }
+            return nb;
         }
 
         [HttpPost]
         public void AddNotebook([FromBody] Notebook nb)
         {
             AuthData authData = GetAuthDataAndThrowIfNotAuthorized();
+            if (!authData.IsAdmin)
+            {
+                nb.NamespaceMd5 = authData.NamespaceMd5;
+            }
             Storage.AddNotebook(nb);
         }
 
@@ -61,6 +70,14 @@ namespace WorklogWebApp.Controllers
         public void RemoveNotebook(string id)
         {
             AuthData authData = GetAuthDataAndThrowIfNotAuthorized();
+            var nb = Storage.GetNotebook(id);
+            if (nb == null) return;
+
+            if (!authData.IsAdmin)
+            {
+                if (nb.NamespaceMd5 != authData.NamespaceMd5) throw HttpException.Forbid("You do not have access to this notebook");
+            }
+
             Storage.RemoveNotebook(id);
         }
 
@@ -69,12 +86,28 @@ namespace WorklogWebApp.Controllers
         public void AddRecord([FromRoute] string nbId, [FromBody] Record rec)
         {
             AuthData authData = GetAuthDataAndThrowIfNotAuthorized();
+            var nb = Storage.GetNotebook(nbId);
+            if (nb == null) return;
+
+            if (!authData.IsAdmin)
+            {
+                if (nb.NamespaceMd5 != authData.NamespaceMd5) throw HttpException.Forbid("You do not have access to this notebook");
+            }
+
             Storage.AddRecord(nbId, rec);
         }
         [HttpDelete("{nbId}/record/{recId}")]
         public void RemoveRecord([FromRoute]string nbId, [FromRoute]string recId)
         {
             AuthData authData = GetAuthDataAndThrowIfNotAuthorized();
+            var nb = Storage.GetNotebook(nbId);
+            if (nb == null) return;
+
+            if (!authData.IsAdmin)
+            {
+                if (nb.NamespaceMd5 != authData.NamespaceMd5) throw HttpException.Forbid("You do not have access to this notebook");
+            }
+
             Storage.RemoveRecord(nbId, recId);
         }
         #endregion
