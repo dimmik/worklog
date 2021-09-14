@@ -26,10 +26,12 @@ else
                 <span style="font-size:x-small">
                     Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" />
                     last records out of @((notebook.Records ?? new List<Record>()).Count())
+                    |
+                    completed: <input type="checkbox" checked="@ShowCompleted" @onclick="() => ShowCompleted = !ShowCompleted"/>
                 </span>
             </td>
         </tr>
-        @foreach (var r in ((notebook.Records ?? new List<Record>()).OrderBy(r => r.Timestamp).TakeLast(NumLastRecords)))
+        @foreach (var r in ((notebook.Records ?? new List<Record>()).Where(r => ShowCompleted || !r.Metadata.Completed).OrderBy(r => r.Timestamp).TakeLast(NumLastRecords)))
         {
             var rId = r.Id;
 
@@ -41,7 +43,7 @@ else
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
                         <input type="checkbox" checked="@r.Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }" />
-                        <span style="cursor:pointer; font-size:small" @onclick="async () => await RemoveRecord(rId)">🗙</span>
+                        <span style="cursor:pointer; font-size:small; border: 1px dashed" @onclick="async () => await RemoveRecord(rId)">del</span>
                     </span>
                 </td>
                 <td style="width: 95%">
@@ -83,8 +85,10 @@ else
                           @bind:event="oninput"
                           @onkeydown="(KeyboardEventArgs e) => AddRecordByEnter(e)"
                           @ref="NewRecordContentElem" />
-                <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent" /> Encrypt
-                Key: <input type="text" id="enckey" @bind-value="EncryptionKey" />
+                <span style="font-size:x-small">
+                    <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent" /> Encrypt
+                    Key: <input type="password" id="enckey" @bind-value="EncryptionKey" />
+                </span>
                 <button @onclick="AddRecord">Add</button>
             </td>
         </tr>
@@ -97,6 +101,7 @@ else
     protected Notebook notebook { get; set; }
     protected bool NbNotFound = false;
     protected int NumLastRecords { get; set; }
+    protected bool ShowCompleted { get; set; }
 
 
     protected string NewRecordContent = "";
@@ -116,6 +121,8 @@ else
         await ReloadNotebook();
         userSettings = (await AppState.Retrieve<UserSettings>("UserSettings")) ?? new UserSettings();
         NumLastRecords = userSettings.DefaultRecordsToShow;
+        ShowCompleted = userSettings.ShowCompleted;
+        EncryptionKey = userSettings.DefaultShowEncryptedOptions.key;
     }
 
 

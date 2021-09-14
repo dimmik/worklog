@@ -11,6 +11,8 @@ else
 {
 <ul style="font-size: small">
     <li>Number of last records to show: <input type="text" @bind-value="userSettings.DefaultRecordsToShow"/></li>
+    <li>Show completed records: <input type="checkbox" checked="@userSettings.ShowCompleted"
+       @onclick="() => userSettings.ShowCompleted = !userSettings.ShowCompleted"></li>
     <li>Encryption defaults:
         <ol>
             <li>Show Encrypted: <input type="checkbox" checked="@userSettings.DefaultShowEncryptedOptions.showEncrypted"
