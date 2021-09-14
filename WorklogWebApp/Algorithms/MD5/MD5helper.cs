@@ -1,11 +1,6 @@
-
-
-
-
-
 using System;
 
-namespace MD5
+namespace Algorithms.MD5
 {
 
 

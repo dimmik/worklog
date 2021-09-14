@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Algorithms.Encryption;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,15 @@ namespace ConsoleTest
     class ConsoleTest
     {
         static void Main()
+        {
+            string key = "my awesome key";
+            string text = File.ReadAllText("./test-inmem-nbs.json");
+            var enc = new ValidatingXorEncryptor();
+            var encrypted = enc.EncryptAndReturnB64(key, text);
+
+            var decr = enc.DecryptFromB64(key + " ", encrypted);
+        }
+        static void Mainxx()
         {
             string data = File.ReadAllText("./test-inmem-nbs.json");
             Notebook[] n = JsonConvert.DeserializeObject<Notebook[]>(data);

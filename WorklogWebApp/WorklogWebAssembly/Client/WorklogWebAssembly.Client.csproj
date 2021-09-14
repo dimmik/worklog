@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Algorithms\Algorithms.csproj" />
     <ProjectReference Include="..\..\WorklogDomain\WorklogDomain.csproj" />
     <ProjectReference Include="..\Shared\WorklogWebAssembly.Shared.csproj" />
   </ItemGroup>
