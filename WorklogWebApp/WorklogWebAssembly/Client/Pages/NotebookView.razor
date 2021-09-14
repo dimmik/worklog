@@ -41,13 +41,18 @@
                                 @((MarkupString)CleanupAndPrepare(Decrypt(dOpts[rId], r.Content)))
                             </span>
                             <br />
-                            Show Encrypted:
-                            <input type="checkbox" checked="@dOpts[rId].showEncrypted"
-                                   @onclick="() => { dOpts[rId].showEncrypted = !dOpts[rId].showEncrypted;}" /><br />
-                            Decrypt:
-                            <input type="checkbox" checked="@dOpts[rId].decrypt"
-                                   @onclick="() => { dOpts[rId].decrypt = !dOpts[rId].decrypt;}" /><br />
-                            Key: <input type="text" @bind-value="dOpts[rId].key" />
+                            <span style="font-size: x-small">
+                                <input type="checkbox" id="@($"se{rId}")" checked="@dOpts[rId].showEncrypted"
+                                       @onclick="() => { dOpts[rId].showEncrypted = !dOpts[rId].showEncrypted;}" />
+                                <label for="@($"se{rId}")">Show Encrypted</label>
+
+
+                                <input type="checkbox" id="@($"d{rId}")" checked="@dOpts[rId].decrypt"
+                                       @onclick="() => { dOpts[rId].decrypt = !dOpts[rId].decrypt;}" />
+                                <label for="@($"d{rId}")">Decrypt</label>
+
+                                <input type="password" id="@($"k{rId}")" @bind-value="dOpts[rId].key" />
+                            </span>
                         </span>
 
                     }
