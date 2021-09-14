@@ -6,84 +6,89 @@
 @inject HttpClient Http
 @inject AppState AppState
 @inject ISymmetricEncryptor enc
+@inject IJSRuntime JsRuntime
 
 @if (notebook == null && !NbNotFound)
 {
-  <p>Loading Notebook...</p>
-} else if (NbNotFound)
+    <p>Loading Notebook...</p>
+}
+else if (NbNotFound)
 {
     <p>Notebook with ID <pre>@NbId</pre> not found </p>
-} else
+}
+else
 {
 
-<table width="100%" border="1">
-    <tr>
-        <td colspan="2">
-            <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span> <span class="button small-btn" @onclick="ReloadNotebook">Refresh</span><br/>
-             <span style="font-size:x-small">
-                Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" /> 
-                 last records out of @((notebook.Records ?? new List<Record>()).Count())
-             </span>
-</td>
-    </tr>
-    @foreach (var r in ((notebook.Records ?? new List<Record>()).OrderBy(r => r.Timestamp).TakeLast(NumLastRecords)))
-    {
-        var rId = r.Id;
-
-        if (!dOpts.ContainsKey(rId)) dOpts[rId] = userSettings.DefaultShowEncryptedOptions.Clone();
-        if (!recs.ContainsKey(rId)) recs[rId] = r;
-
+    <table width="100%" border="1">
         <tr>
-            <td style="width: 5%" valign="top" align="center">
-                <span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
-                <input type="checkbox" checked="@r.Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }"/>
+            <td colspan="2">
+                <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span> <span class="button small-btn" @onclick="ReloadNotebook">Refresh</span><br />
+                <span style="font-size:x-small">
+                    Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" />
+                    last records out of @((notebook.Records ?? new List<Record>()).Count())
                 </span>
             </td>
-            <td style="width: 95%">
-                <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word; @(r.Metadata.Completed ? "text-decoration: line-through" : "")">
-                    @if (!r.Metadata.Encrypted)
-                    {
-                        @((MarkupString)CleanupAndPrepare(r.Content))
-                    }
-                    else
-                    {
-                        <span>
-                            <span style="@(dOpts[rId].showEncrypted ? "font-size: xx-small; color: DarkGrey" : dOpts[rId].decrypt ? "color: darkblue" : "font-style: italic; color: brown")">
-                                @((MarkupString)CleanupAndPrepare(Decrypt(dOpts[rId], r.Content)))
+        </tr>
+        @foreach (var r in ((notebook.Records ?? new List<Record>()).OrderBy(r => r.Timestamp).TakeLast(NumLastRecords)))
+        {
+            var rId = r.Id;
+
+            if (!dOpts.ContainsKey(rId)) dOpts[rId] = userSettings.DefaultShowEncryptedOptions.Clone();
+            if (!recs.ContainsKey(rId)) recs[rId] = r;
+
+            <tr>
+                <td style="width: 5%" valign="top" align="center">
+                    <span style="font-size: xx-small">
+                        <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
+                        <input type="checkbox" checked="@r.Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }" />
+                        <span style="cursor:pointer; font-size:small" @onclick="async () => await RemoveRecord(rId)">🗙</span>
+                    </span>
+                </td>
+                <td style="width: 95%">
+                    <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word; @(r.Metadata.Completed ? "text-decoration: line-through" : "")">
+                        @if (!r.Metadata.Encrypted)
+                        {
+                            @((MarkupString)CleanupAndPrepare(r.Content))
+                        }
+                        else
+                        {
+                            <span>
+                                <span style="@(dOpts[rId].showEncrypted ? "font-size: xx-small; color: DarkGrey" : dOpts[rId].decrypt ? "color: darkblue" : "font-style: italic; color: brown")">
+                                    @((MarkupString)CleanupAndPrepare(Decrypt(dOpts[rId], r.Content)))
+                                </span>
+                                <br />
+                                <span style="font-size: x-small">
+                                    <input type="checkbox" id="@($"se{rId}")" checked="@dOpts[rId].showEncrypted"
+                                           @onclick="() => { dOpts[rId].showEncrypted = !dOpts[rId].showEncrypted;}" />
+                                    <label for="@($"se{rId}")">Show Encrypted</label>
+
+
+                                    <input type="checkbox" id="@($"d{rId}")" checked="@dOpts[rId].decrypt"
+                                           @onclick="() => { dOpts[rId].decrypt = !dOpts[rId].decrypt;}" />
+                                    <label for="@($"d{rId}")">Decrypt</label>
+
+                                    <input type="password" id="@($"k{rId}")" @bind-value="dOpts[rId].key" />
+                                </span>
                             </span>
-                            <br />
-                            <span style="font-size: x-small">
-                                <input type="checkbox" id="@($"se{rId}")" checked="@dOpts[rId].showEncrypted"
-                                       @onclick="() => { dOpts[rId].showEncrypted = !dOpts[rId].showEncrypted;}" />
-                                <label for="@($"se{rId}")">Show Encrypted</label>
 
-
-                                <input type="checkbox" id="@($"d{rId}")" checked="@dOpts[rId].decrypt"
-                                       @onclick="() => { dOpts[rId].decrypt = !dOpts[rId].decrypt;}" />
-                                <label for="@($"d{rId}")">Decrypt</label>
-
-                                <input type="password" id="@($"k{rId}")" @bind-value="dOpts[rId].key" />
-                            </span>
-                        </span>
-
-                    }
-                </div>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="2">
+                <textarea id="NewRecordContent" style="width: 100%"
+                          @bind="NewRecordContent"
+                          @bind:event="oninput"
+                          @onkeydown="(KeyboardEventArgs e) => AddRecordByEnter(e)"
+                          @ref="NewRecordContentElem" />
+                <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent" /> Encrypt
+                Key: <input type="text" id="enckey" @bind-value="EncryptionKey" />
+                <button @onclick="AddRecord">Add</button>
             </td>
         </tr>
-    }
-<tr>
-    <td colspan="2">
-            <textarea id="NewRecordContent" style="width: 100%"
-                      @bind="NewRecordContent"
-                      @bind:event="oninput"
-                      @onkeydown="(KeyboardEventArgs e) => AddRecordByEnter(e)"
-                      @ref="NewRecordContentElem" />
-            <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent"/> Encrypt
-            Key: <input type="text" id="enckey" @bind-value="EncryptionKey"/>
-            <button @onclick="AddRecord">Add</button>
-    </td>
-</tr>
-</table>
+    </table>
 }
 
 @code {
@@ -136,13 +141,16 @@
         {
             var decr = enc.DecryptFromB64(dOpt.key, text);
             return decr;
-        } catch (WrongKeyException)
+        }
+        catch (WrongKeyException)
         {
             return "Cannot decrypt: wrong key";
-        } catch (WrongEncryptedContentException)
+        }
+        catch (WrongEncryptedContentException)
         {
             return "Cannot decrypt: wrong format";
-        } catch
+        }
+        catch
         {
             return "Cannot decrypt: unknown reason";
         }
@@ -182,7 +190,8 @@
         {
             rec.Metadata.Encrypted = true;
             rec.Content = enc.EncryptAndReturnB64(EncryptionKey, NewRecordContent);
-        } else
+        }
+        else
         {
             rec.Content = NewRecordContent;
         }
@@ -193,6 +202,9 @@
     }
     protected async Task RemoveRecord(string recId)
     {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Delete Record?");
+        if (!confirmed) return;
+
         await Http.DeleteAsync($"api/notebook/{NbId}/record/{recId}");
         await ReloadNotebook();
     }

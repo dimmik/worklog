@@ -3,6 +3,7 @@
 @using Algorithms
 @inject HttpClient Http
 @inject AppState State
+@inject IJSRuntime JsRuntime
 
 <h1>Notebook List</h1>
 
@@ -84,6 +85,8 @@ else
     }
     protected async Task RemoveNotebook(string id)
     {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Delete Notebook?");
+        if (!confirmed) return;
         await Http.DeleteAsync($"api/notebook/{id}");
         await ReloadNotebooks();
     }
