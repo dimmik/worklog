@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Algorithms.MD5;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorklogWebAssembly.Shared
+namespace Algorithms
 {
     public static class StringUtils
     {

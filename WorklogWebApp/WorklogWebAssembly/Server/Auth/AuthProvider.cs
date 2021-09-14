@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorklogDomain;
-using WorklogWebAssembly.Shared;
+using Algorithms;
 
 namespace WorklogWebAssembly.Server.Auth
 {

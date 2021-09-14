@@ -1,7 +1,10 @@
 ﻿@page "/notebooks/{nbId}"
 @using WorklogDomain
+@using Algorithms.Encryption
+@using WorklogWebAssembly.Client.Data
 @inject HttpClient Http
 @inject AppState AppState
+@inject ISymmetricEncryptor enc
 
 @if (notebook == null && !NbNotFound)
 {
@@ -21,10 +24,34 @@
     </tr>
     @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
     {
+        var rId = r.Id;
+        if (!dOpts.ContainsKey(rId)) dOpts[rId] = userSettings.DefaultShowEncryptedOptions.Clone();
         <tr>
             <td style="width: 5%" valign="top"><span style="font-size: xx-small"><nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr></span></td>
-            <td style="width: 95%;">
-                    @((MarkupString)r.Content.Replace("<", "&lt;").Replace("\r\n", "\n").Replace("\n", "<br/>"))
+            <td style="width: 95%">
+                <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word;">
+                    @if (!r.Metadata.Encrypted)
+                    {
+                        @((MarkupString)CleanupAndPrepare(r.Content))
+                    }
+                    else
+                    {
+                        <span>
+                            <span style="@(dOpts[rId].showEncrypted ? "font-size: xx-small; color: DarkGrey" : dOpts[rId].decrypt ? "color: darkblue" : "font-style: italic; color: brown")">
+                                @((MarkupString)CleanupAndPrepare(Decrypt(dOpts[rId], r.Content)))
+                            </span>
+                            <br />
+                            Show Encrypted:
+                            <input type="checkbox" checked="@dOpts[rId].showEncrypted"
+                                   @onclick="() => { dOpts[rId].showEncrypted = !dOpts[rId].showEncrypted;}" /><br />
+                            Decrypt:
+                            <input type="checkbox" checked="@dOpts[rId].decrypt"
+                                   @onclick="() => { dOpts[rId].decrypt = !dOpts[rId].decrypt;}" /><br />
+                            Key: <input type="text" @bind-value="dOpts[rId].key" />
+                        </span>
+
+                    }
+                </div>
             </td>
         </tr>
     }
@@ -35,6 +62,8 @@
                       @bind:event="oninput"
                       @onkeydown="(KeyboardEventArgs e) => AddRecordByEnter(e)"
                       @ref="NewRecordContentElem" />
+            <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent"/> Encrypt
+            Key: <input type="text" id="enckey" @bind-value="EncryptionKey"/>
             <button @onclick="AddRecord">Add</button>
     </td>
 </tr>
@@ -52,12 +81,56 @@
     protected string NewRecordContent = "";
     private ElementReference NewRecordContentElem;
 
+    private bool EncryptContent = false;
+    private string EncryptionKey;
+
+    protected Dictionary<string, ShowEncryptedOptions> dOpts = new Dictionary<string, ShowEncryptedOptions>();
+
+
+    protected UserSettings userSettings;
+
     protected override async Task OnInitializedAsync()
     {
         await ReloadNotebook();
-        NumLastRecords = await AppState.Retrieve<int>(nameof(NumLastRecords));
-        if (NumLastRecords == 0) NumLastRecords = 100;
+        userSettings = (await AppState.Retrieve<UserSettings>("UserSettings")) ?? new UserSettings();
+        NumLastRecords = userSettings.DefaultRecordsToShow;
     }
+
+
+    protected string CleanupAndPrepare(string txt)
+    {
+        var safeStr = txt.Replace("<", "&lt;");
+        var prepared = string.Join("<wbr/>", ChunksUpto(safeStr, 10));
+        prepared = prepared.Replace("\r\n", "\n").Replace("\n", "<br/>");
+        return prepared;
+    }
+
+    static IEnumerable<string> ChunksUpto(string str, int maxChunkSize)
+    {
+        for (int i = 0; i < str.Length; i += maxChunkSize)
+            yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
+    }
+
+    protected string Decrypt(ShowEncryptedOptions dOpt, string text)
+    {
+        if (dOpt.showEncrypted) return text;
+        if (!dOpt.decrypt || string.IsNullOrWhiteSpace(dOpt.key)) return "Encrypted Record";
+        try
+        {
+            var decr = enc.DecryptFromB64(dOpt.key, text);
+            return decr;
+        } catch (WrongKeyException)
+        {
+            return "Cannot decrypt: wrong key";
+        } catch (WrongEncryptedContentException)
+        {
+            return "Cannot decrypt: wrong format";
+        } catch
+        {
+            return "Cannot decrypt: unknown reason";
+        }
+    }
+
     protected async Task ReloadNotebook()
     {
         try
@@ -69,12 +142,12 @@
             NbNotFound = true;
         }
     }
-    protected async Task ChangedNumLastRecords(string numS)
+    protected void ChangedNumLastRecords(string numS)
     {
         if (int.TryParse(numS, out int num))
         {
             NumLastRecords = num;
-            await AppState.Store(nameof(NumLastRecords), NumLastRecords);
+            //await AppState.Store(nameof(NumLastRecords), NumLastRecords);
         }
     }
     protected async Task AddRecordByEnter(KeyboardEventArgs e)
@@ -87,7 +160,14 @@
     protected async Task AddRecord()
     {
         var rec = new Record();
-        rec.Content = NewRecordContent;
+        if (EncryptContent)
+        {
+            rec.Metadata.Encrypted = true;
+            rec.Content = enc.EncryptAndReturnB64(EncryptionKey, NewRecordContent);
+        } else
+        {
+            rec.Content = NewRecordContent;
+        }
         await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", rec);
         NewRecordContent = "";
         await ReloadNotebook();
@@ -98,4 +178,6 @@
         await Http.DeleteAsync($"api/notebook/{NbId}/record/{recId}");
         await ReloadNotebook();
     }
+
+
 }

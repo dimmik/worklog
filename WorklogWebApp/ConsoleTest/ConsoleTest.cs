@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Algorithms.Encryption;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,15 @@ namespace ConsoleTest
     class ConsoleTest
     {
         static void Main()
+        {
+            string key = "my awesome key";
+            string text = File.ReadAllText("./test-inmem-nbs.json");
+            var enc = new ValidatingXorEncryptor();
+            var encrypted = enc.EncryptAndReturnB64(key, text);
+
+            var decr = enc.DecryptFromB64(key, encrypted);
+        }
+        static void Mainxx()
         {
             string data = File.ReadAllText("./test-inmem-nbs.json");
             Notebook[] n = JsonConvert.DeserializeObject<Notebook[]>(data);
@@ -42,7 +52,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "first", "test", "fun" }
+                                Tags = new List<string>() { "first", "test", "fun" }
                             },
                             Content = "Notebook 1 Record 1"
                         },
@@ -53,7 +63,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "second", "test", "fun" }
+                                Tags = new List<string>(){ "second", "test", "fun" }
                             },
                             Content = "Notebook 1 Record 2"
                         },
@@ -64,7 +74,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "third", "test", "fun" }
+                                Tags = new List<string>(){ "third", "test", "fun" }
                             },
                             Content = "Notebook 1 Record 3"
                         },
@@ -83,7 +93,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "first", "test", "fun" }
+                                Tags = new List<string>(){ "first", "test", "fun" }
                             },
                             Content = "Notebook 2 Record 1"
                         },
@@ -94,7 +104,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "second", "test", "fun" }
+                                Tags = new List<string>() { "second", "test", "fun" }
                             },
                             Content = "Notebook 2 Record 2"
                         },
@@ -105,7 +115,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "third", "test", "fun" }
+                                Tags = new List<string>() { "third", "test", "fun" }
                             },
                             Content = "Notebook 2 Record 3"
                         },

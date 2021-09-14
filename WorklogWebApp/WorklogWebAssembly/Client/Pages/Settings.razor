@@ -1,0 +1,55 @@
+﻿@page "/settings"
+@using WorklogWebAssembly.Client.Data
+@inject AppState AppState
+
+<h3>User Settings</h3>
+@if (userSettings == null)
+{
+    <p>Loading settings...</p>
+}
+else
+{
+<ul>
+    <li>Number of last records to show: <input type="text" @bind-value="userSettings.DefaultRecordsToShow"/></li>
+    <li>Encryption defaults:
+        <ol>
+            <li>Show Encrypted: <input type="checkbox" checked="@userSettings.DefaultShowEncryptedOptions.showEncrypted"
+                                       @onclick="() => userSettings.DefaultShowEncryptedOptions.showEncrypted = !userSettings.DefaultShowEncryptedOptions.showEncrypted"
+                                       >
+            </li>
+            <li>Decrypt: <input type="checkbox" checked="@userSettings.DefaultShowEncryptedOptions.decrypt"
+                                @onclick="() => userSettings.DefaultShowEncryptedOptions.decrypt = !userSettings.DefaultShowEncryptedOptions.decrypt"
+                                >
+            </li>
+            <li>Key: <input type="text" @bind-value="@userSettings.DefaultShowEncryptedOptions.key"></li>
+        </ol>
+    </li>
+    <li><button @onclick="StoreUserSettings">Save</button>
+    <span style="visibility: @(IsSaved ? "visible" : "hidden")">Saved</span>
+    </li>
+</ul>
+}
+
+@code {
+
+    protected UserSettings userSettings;
+    protected bool IsSaved = false;
+    protected override async Task OnInitializedAsync()
+    {
+        userSettings = (await AppState.Retrieve<UserSettings>("UserSettings")) ?? new UserSettings();
+    }
+    protected async Task StoreUserSettings()
+    {
+        await AppState.Store<UserSettings>("UserSettings", userSettings);
+        IsSaved = true;
+        var timer = new System.Threading.Timer((_) =>
+        {
+            InvokeAsync(() =>
+            {
+                IsSaved = false;
+                StateHasChanged();
+            });
+        }, null, 3000, System.Threading.Timeout.Infinite);
+    }
+
+}

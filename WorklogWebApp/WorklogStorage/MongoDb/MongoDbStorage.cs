@@ -42,7 +42,7 @@ namespace WorklogStorage.MongoDb
                 .AsQueryable();
             if (namespaceMd5 != null) nbsQ = nbsQ.Where(n => n.NamespaceMd5 == namespaceMd5);
 
-            var nbs = nbsQ.OrderByDescending(n => n.Created);
+            var nbs = nbsQ.OrderBy(n => n.Created);
 
             return nbs;
         }
