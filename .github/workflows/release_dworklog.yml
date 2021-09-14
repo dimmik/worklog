@@ -57,14 +57,14 @@ jobs:
           package: .
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H:%M:%S')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H-%M-%S')"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: deploy/tag-${{ steps.date.outputs.date }}
+          tag_name: deploy/release-${{ steps.date.outputs.date }}
           release_name: Release ${{ steps.date.outputs.date }}
           body: |
             No comments
