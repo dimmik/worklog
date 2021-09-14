@@ -41,7 +41,7 @@ else
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
                         <input type="checkbox" checked="@r.Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }" />
-                        <span style="cursor:pointer; font-size:small" @onclick="async () => await RemoveRecord(rId)">🗙</span>
+                        <span style="cursor:pointer; font-size:small; border: 1px dashed" @onclick="async () => await RemoveRecord(rId)">del</span>
                     </span>
                 </td>
                 <td style="width: 95%">
