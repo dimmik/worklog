@@ -18,9 +18,11 @@
 <table width="100%" border="1">
     <tr>
         <td colspan="2">
-            @notebook.Name [@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]
-            Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" /> last records
-        </td>
+            <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span><br/>
+             <span style="font-size:x-small">
+                Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" /> last records
+             </span>
+</td>
     </tr>
     @foreach (var r in ((notebook.Records ?? new List<Record>()).TakeLast(NumLastRecords)))
     {
