@@ -1,4 +1,12 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
 
 <h1>Worklog App</h1>
 
+@code
+{
+    protected override void OnInitialized()
+    {
+        NavManager.NavigateTo("/notebooks");
+    }
+}
