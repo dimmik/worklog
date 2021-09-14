@@ -52,7 +52,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "first", "test", "fun" }
+                                Tags = new List<string>() { "first", "test", "fun" }
                             },
                             Content = "Notebook 1 Record 1"
                         },
@@ -63,7 +63,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "second", "test", "fun" }
+                                Tags = new List<string>(){ "second", "test", "fun" }
                             },
                             Content = "Notebook 1 Record 2"
                         },
@@ -74,7 +74,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "third", "test", "fun" }
+                                Tags = new List<string>(){ "third", "test", "fun" }
                             },
                             Content = "Notebook 1 Record 3"
                         },
@@ -93,7 +93,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "first", "test", "fun" }
+                                Tags = new List<string>(){ "first", "test", "fun" }
                             },
                             Content = "Notebook 2 Record 1"
                         },
@@ -104,7 +104,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "second", "test", "fun" }
+                                Tags = new List<string>() { "second", "test", "fun" }
                             },
                             Content = "Notebook 2 Record 2"
                         },
@@ -115,7 +115,7 @@ namespace ConsoleTest
                             Metadata = new RecordMetadata()
                             {
                                 Encrypted = false,
-                                Tags = new[] { "third", "test", "fun" }
+                                Tags = new List<string>() { "third", "test", "fun" }
                             },
                             Content = "Notebook 2 Record 3"
                         },

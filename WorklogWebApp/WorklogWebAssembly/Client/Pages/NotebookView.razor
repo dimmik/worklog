@@ -37,7 +37,7 @@
                     else
                     {
                         <span>
-                            <span style="@(dOpts[rId].showEncrypted ? "font-size: xx-small" : dOpts[rId].decrypt ? "color: darkblue" : "font-style: italic; color: brown")">
+                            <span style="@(dOpts[rId].showEncrypted ? "font-size: xx-small; color: DarkGrey" : dOpts[rId].decrypt ? "color: darkblue" : "font-style: italic; color: brown")">
                                 @((MarkupString)CleanupAndPrepare(Decrypt(dOpts[rId], r.Content)))
                             </span>
                             <br />
