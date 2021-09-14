@@ -18,7 +18,7 @@ namespace ConsoleTest
             var enc = new ValidatingXorEncryptor();
             var encrypted = enc.EncryptAndReturnB64(key, text);
 
-            var decr = enc.DecryptFromB64(key + " ", encrypted);
+            var decr = enc.DecryptFromB64(key, encrypted);
         }
         static void Mainxx()
         {
