@@ -33,6 +33,7 @@ namespace WorklogWebAssembly.Server.Controllers
             if (authDataFromCookie.IsAuthorized && !authDataFromCookie.IsAdmin)
             {
                 authDataFromCookie.IsAuthorized = Storage.GetNotebooks(authDataFromCookie.NamespaceMd5).Any();
+                Logout();
             }
             return authDataFromCookie;
         }
