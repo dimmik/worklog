@@ -7,22 +7,29 @@ namespace Algorithms.Encryption
     public class ValidatingXorEncryptor : ISymmetricEncryptor
     {
         private readonly Random r = new Random((int)(DateTimeOffset.Now.Ticks % int.MaxValue));
-        public int saltSize { get; set; } = 4;
+        public int SaltSize { get; set; } = 4;
+        public string EncryptedDelimiter { get; set; } = "#";
         public string DecryptFromB64(string key, string encryptedB64Content)
         {
-            if (string.IsNullOrWhiteSpace(encryptedB64Content)) throw new WrongEncryptedContentException();
+            string b64 = CheckKeyAndGetEncryptedB64(key, encryptedB64Content);
             var keyBytes = Encoding.UTF8.GetBytes(key);
-            var parts = encryptedB64Content.Split('#');
+            byte[] encrytedBytes = Convert.FromBase64String(b64);
+            var decryptedBytes = EncryptorUtils.Xor(keyBytes, encrytedBytes);
+            var str = Encoding.UTF8.GetString(decryptedBytes);
+            return str;
+        }
+
+        private string CheckKeyAndGetEncryptedB64(string key, string encryptedB64Content)
+        {
+            if (string.IsNullOrWhiteSpace(encryptedB64Content)) throw new WrongEncryptedContentException();
+            var parts = encryptedB64Content.Split(new[] { EncryptedDelimiter }, StringSplitOptions.None);
             if (parts.Length != 3) throw new WrongEncryptedContentException();
             var salt = parts[0];
             var saltedKeyFromMsgMd5 = parts[1];
             var saltedKeyMd5 = GetSaltedKeyMd5(key, salt);
             if (saltedKeyFromMsgMd5 != saltedKeyMd5) throw new WrongKeyException();
             var b64 = parts[2];
-            byte[] encrytedBytes = Convert.FromBase64String(b64);
-            var decryptedBytes = EncryptorUtils.Xor(keyBytes, encrytedBytes);
-            var str = Encoding.UTF8.GetString(decryptedBytes);
-            return str;
+            return b64;
         }
 
         public string EncryptAndReturnB64(string key, string plaintextContent)
@@ -33,7 +40,7 @@ namespace Algorithms.Encryption
             var b64 = Convert.ToBase64String(encryptedBytes);
             string salt = GenerateSalt();
             string saltedKeyMd5 = GetSaltedKeyMd5(key, salt);
-            return $"{salt}#{saltedKeyMd5}#{b64}";
+            return $"{salt}{EncryptedDelimiter}{saltedKeyMd5}{EncryptedDelimiter}{b64}";
         }
 
         private static string GetSaltedKeyMd5(string key, string salt)
@@ -45,7 +52,7 @@ namespace Algorithms.Encryption
 
         private string GenerateSalt()
         {
-            byte[] saltBuff = new byte[saltSize];
+            byte[] saltBuff = new byte[SaltSize];
             r.NextBytes(saltBuff);
             string salt = Convert.ToBase64String(saltBuff);
             return salt;
