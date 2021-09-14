@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Algorithms.Encryption
 {
     [Serializable]
-    internal class WrongEncryptedContentException : Exception
+    public class WrongEncryptedContentException : Exception
     {
         public WrongEncryptedContentException()
         {
