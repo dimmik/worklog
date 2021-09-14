@@ -14,7 +14,7 @@ namespace ConsoleTest
         {
             string data = File.ReadAllText("./test-inmem-nbs.json");
             Notebook[] n = JsonConvert.DeserializeObject<Notebook[]>(data);
-            IWorklogStorage st = new InMemoryWorklogStorage(n);
+            IWorklogStorage st = new PersistentLocalStorage("./test-inmem-nbs.json");
             var nb = st.GetNotebook("n1Id");
         }
         static void MainGenTestNb(string[] args)

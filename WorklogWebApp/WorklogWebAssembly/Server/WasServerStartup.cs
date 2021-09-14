@@ -6,17 +6,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using WorklogDomain;
 using WorklogStorage;
 using WorklogStorage.InMemoryStorage;
+using WorklogStorage.MongoDb;
+using WorklogWebApp.Exceptions;
 
 namespace WorklogWebAssembly.Server
 {
-    public class WasStartup
+    public class WasServerStartup
     {
-        public WasStartup(IConfiguration configuration)
+        public WasServerStartup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -27,13 +31,27 @@ namespace WorklogWebAssembly.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            IWorklogStorage imMemStorage = new InMemoryWorklogStorage(
-                JsonConvert.DeserializeObject<Notebook[]>(File.ReadAllText("./test-inmem-nbs.json"))
-                );
-            services.AddSingleton(imMemStorage);
+            SetUpStorage(services);
             services.AddControllers();
             services.AddControllersWithViews();
             services.AddRazorPages();
+        }
+
+        private void SetUpStorage(IServiceCollection services)
+        {
+            IWorklogStorage mongoDbStorage() => new MongoDbStorage(
+                Configuration.GetValue<string>("MongoDbUrl"),
+                Configuration.GetValue<string>("MongoDbUsername"),
+                Configuration.GetValue<string>("MongoDbPassword")
+                );
+            IWorklogStorage inMemStorage() => new PersistentLocalStorage("./test-inmem-nbs.json");
+            var storages = new Dictionary<string, Func<IWorklogStorage>>()
+            {
+                {"local", inMemStorage},
+                {"mongo", mongoDbStorage}
+            };
+            var storageType = Configuration.GetValue("StorageType", "local");
+            services.AddSingleton(storages.ContainsKey(storageType) ? storages[storageType]() : storages["local"]());        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +69,8 @@ namespace WorklogWebAssembly.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseMiddleware<HttpExceptionMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();

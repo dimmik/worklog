@@ -20,7 +20,7 @@ namespace WorklogWebAssembly.Server
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<WasStartup>();
+                    webBuilder.UseStartup<WasServerStartup>();
                 });
     }
 }

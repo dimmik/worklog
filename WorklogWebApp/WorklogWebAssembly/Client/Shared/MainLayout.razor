@@ -1,17 +1,58 @@
 ﻿@inherits LayoutComponentBase
+@using WorklogDomain
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+@inject AppState appState
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu MainLayout="this"/>
         </div>
 
-        <div class="content px-4">
-            @Body
+        <div class="main">
+            <div class="content px-4">
+                @if (AuthData == null)
+                {
+                    <p>Checking Auth ...</p>
+
+                }
+                else if (!AuthData.IsAuthorized)
+                {
+                    <p>Auth Code <input type="text" @onchange="@((ChangeEventArgs __e) => Authorize(__e.Value.ToString()))" /> <button>Log in</button></p>
+                }
+                else
+                {
+                    @Body
+                }
+            </div>
         </div>
     </div>
-</div>
+
+@code {
+    public AuthData AuthData { get; set; }
+    protected string Namespace = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadAuthData();
+    }
+    protected async Task Authorize(string auth)
+    {
+        await Http.PostAsJsonAsync("api/auth", auth);
+        await ReloadAuthData();
+    }
+    public async Task Logout()
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Log out?");
+        if (!confirmed) return;
+        await Http.GetAsync("api/auth/logout");
+        await ReloadAuthData();
+    }
+    private async Task ReloadAuthData()
+    {
+        AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+        await appState.Store("authData", AuthData);
+    }
+}
