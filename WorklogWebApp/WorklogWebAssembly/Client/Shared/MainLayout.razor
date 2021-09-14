@@ -1,44 +1,36 @@
 ﻿@inherits LayoutComponentBase
 @using WorklogDomain
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime
 
 
-@if (AuthData == null)
-{
-    <div class="page">
-        <div class="main">
-            <div class="content px-4">
-        <p>Checking Auth ...</p>
-                </div>
-            </div>
-    </div>
-}
-else if (!AuthData.IsAuthorized)
-{
-        <div class="page">
-            <div class="main">
-            <div class="content px-4">
-    <p>Please Auth <input type="text" @onchange="@((ChangeEventArgs __e) => Authorize(__e.Value.ToString()))"/></p>
-            </div>
-                </div>
-            </div>
-}
-else
-{
+
     <div class="page">
         <div class="sidebar">
-            <NavMenu />
+            <NavMenu MainLayout="this"/>
         </div>
 
         <div class="main">
             <div class="content px-4">
-                @Body
+                @if (AuthData == null)
+                {
+                    <p>Checking Auth ...</p>
+
+                }
+                else if (!AuthData.IsAuthorized)
+                {
+                    <p>Auth Code <input type="text" @onchange="@((ChangeEventArgs __e) => Authorize(__e.Value.ToString()))" /> <button>Log in</button></p>
+                }
+                else
+                {
+                    @Body
+                }
             </div>
         </div>
     </div>
-}
+
 @code {
-    protected AuthData AuthData;
+    public AuthData AuthData { get; set; }
     protected string Namespace = "";
 
     protected override async Task OnInitializedAsync()
@@ -48,6 +40,13 @@ else
     protected async Task Authorize(string auth)
     {
         await Http.PostAsJsonAsync("api/auth", auth);
+        AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
+    }
+    public async Task Logout()
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Log out?");
+        if (!confirmed) return;
+        await Http.GetAsync("api/auth/logout");
         AuthData = await Http.GetFromJsonAsync<AuthData>("api/auth");
     }
 }

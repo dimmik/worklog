@@ -38,10 +38,12 @@ namespace WorklogStorage.MongoDb
 
         public IEnumerable<Notebook> GetNotebooks(string namespaceMd5)
         {
-            var nbs = GetCollection()
-                .AsQueryable()
-                .Where(n => n.NamespaceMd5 == namespaceMd5)
-                .OrderByDescending(n => n.Created);
+            var nbsQ = GetCollection()
+                .AsQueryable();
+            if (namespaceMd5 != null) nbsQ = nbsQ.Where(n => n.NamespaceMd5 == namespaceMd5);
+
+            var nbs = nbsQ.OrderByDescending(n => n.Created);
+
             return nbs;
         }
 

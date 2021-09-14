@@ -37,7 +37,7 @@ namespace WorklogWebApp.Controllers
 
         private AuthData GetAuthDataAndThrowIfNotAuthorized()
         {
-            var authData = HttpContext.Request.GetAuthData(Configuration.GetValue<string>("AdminPassword"));
+            var authData = HttpContext.Request.GetAuthDataFromCookie(Configuration.GetValue<string>("AdminPassword"));
             if (!authData.IsAuthorized) throw HttpException.NotAuthenticated("Not authenticated");
             return authData;
         }

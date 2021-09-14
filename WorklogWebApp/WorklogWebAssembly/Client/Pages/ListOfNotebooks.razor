@@ -1,5 +1,6 @@
 ﻿@page "/notebooks"
 @using WorklogDomain
+@using WorklogWebAssembly.Shared
 @inject HttpClient Http
 @inject AppState State
 
@@ -42,7 +43,8 @@ else
                         <DataAnnotationsValidator />
                         <ValidationSummary />
 
-                        <InputText id="name" @bind-Value="newNotebook.Name" />
+                        name: <InputText id="name" @bind-Value="newNotebook.Name" />
+                        namespace: <InputText id="namespace" @bind-Value="newNotebook.NamespaceMd5" />
 
                         <button type="submit">Add</button>
                     </EditForm>
@@ -67,7 +69,10 @@ else
     }
     protected async Task AddNotebook()
     {
-        await Http.PostAsJsonAsync<Notebook>("api/notebook", newNotebook);
+        Notebook clone = new();
+        clone.NamespaceMd5 = newNotebook.NamespaceMd5.CreateMD5();
+        clone.Name = newNotebook.Name;
+        await Http.PostAsJsonAsync<Notebook>("api/notebook", clone);
         newNotebook = new();
         await ReloadNotebooks();
     }
