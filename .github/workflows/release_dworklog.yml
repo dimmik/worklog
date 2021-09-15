@@ -18,7 +18,7 @@ jobs:
 
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H-%M-%S')"
+        run: echo "::set-output name=date::$(date -u -d '+3 hours' +'%Y-%m-%dT%H-%M-%SZ+03')"
 
       - name: Find and Replace version
         run: find . -name '*.razor' -exec sed -i ''s/##VERSION_INFO##/${{ steps.date.outputs.date }}/g'' {} \;
@@ -64,7 +64,7 @@ jobs:
           package: .
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H-%M-%S')"
+        run: echo "::set-output name=date::$(date -u -d '+3 hours' +'%Y-%m-%dT%H-%M-%SZ+03')"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
