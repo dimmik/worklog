@@ -16,6 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H-%M-%S')"
+
+      - name: Find and Replace version
+        run: find *.razor -type f -exec sed -i ''s/##VERSION_INFO##/${{ steps.date.outputs.date }}/g'' {} \;
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
