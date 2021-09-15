@@ -36,7 +36,10 @@ namespace WorklogWebAssembly.Server
         public void ConfigureServices(IServiceCollection services)
         {
             SetUpStorage(services);
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
