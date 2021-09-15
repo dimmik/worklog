@@ -42,13 +42,17 @@ else
                 <td style="width: 5%" valign="top" align="center">
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
-                        <input type="checkbox" checked="@recs[rId].Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }" />
+                        <span id="@rId"
+                              style="border: 1px solid black; background-color: @(recs[rId].Metadata.Completed ? "lightblue" : "white"); color: @(recs[rId].Metadata.Completed ? "lightblue" : "white"); cursor: pointer; font-size: small"
+                              @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }">
+                            O
+                        </span>
 
                     </span>
                 </td>
                 <td style="width: 95%">
                     <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word; @(r.Metadata.Completed ? "text-decoration: line-through" : "")">
-                        <!-- ((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true }))) -->
+                        <!--((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true })))-->
                         @if (!r.Metadata.Encrypted)
                         {
                             @((MarkupString)CleanupAndPrepare(r.Content))
@@ -169,8 +173,6 @@ else
         try
         {
             notebook = await Http.GetFromJsonAsync<Notebook>($"api/notebook/{NbId}");
-            //dOpts = new Dictionary<string, ShowEncryptedOptions>();
-            //recs = new Dictionary<string, Record>();
         }
         catch
         {
