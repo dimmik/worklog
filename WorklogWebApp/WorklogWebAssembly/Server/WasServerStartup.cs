@@ -18,7 +18,7 @@ using WorklogStorage;
 using WorklogStorage.InMemoryStorage;
 using WorklogStorage.MongoDb;
 using WorklogWebApp.Exceptions;
-using WorklogWebAssembly.Server.Svc;
+using WorklogWebAssembly.Server.Controllers;
 
 namespace WorklogWebAssembly.Server
 {

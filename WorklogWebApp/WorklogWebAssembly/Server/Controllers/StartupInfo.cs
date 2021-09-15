@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WorklogWebAssembly.Server.Svc
+namespace WorklogWebAssembly.Server.Controllers
 {
     public class StartupInfo
     {
         public DateTimeOffset StartTime { get; set; } = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
         public List<DateTimeOffset> LastWakeups { get; set; } = new List<DateTimeOffset>();
-        public int numberWakeupsToKeep = 15;
+        public int NumberWakeupsToKeep { get; set; } = 15;
         public void Wakeup()
         {
-            if (LastWakeups.Count >= numberWakeupsToKeep)
+            if (LastWakeups.Count >= NumberWakeupsToKeep)
             {
                 LastWakeups.RemoveAt(0);
             }
