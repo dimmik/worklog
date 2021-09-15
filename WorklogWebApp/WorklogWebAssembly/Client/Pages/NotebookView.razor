@@ -22,7 +22,8 @@ else
     <table width="100%" border="1">
         <tr>
             <td colspan="2">
-                <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span> <span class="button small-btn" @onclick="ReloadNotebook">Refresh</span><br />
+                <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span> 
+                <span class="button small-btn" style="cursor:pointer" @onclick="ReloadNotebook">Refresh</span><br />
                 <span style="font-size:x-small">
                     Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" />
                     last records out of @((notebook.Records ?? new List<Record>()).Count())
