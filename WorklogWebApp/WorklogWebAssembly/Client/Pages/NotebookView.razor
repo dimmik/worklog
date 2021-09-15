@@ -42,12 +42,13 @@ else
                 <td style="width: 5%" valign="top" align="center">
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
-                        <input type="checkbox" checked="@r.Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }" />
-                        
+                        <input type="checkbox" checked="@recs[rId].Metadata.Completed" @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }" />
+
                     </span>
                 </td>
                 <td style="width: 95%">
                     <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word; @(r.Metadata.Completed ? "text-decoration: line-through" : "")">
+                        <!-- ((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true }))) -->
                         @if (!r.Metadata.Encrypted)
                         {
                             @((MarkupString)CleanupAndPrepare(r.Content))
@@ -168,6 +169,8 @@ else
         try
         {
             notebook = await Http.GetFromJsonAsync<Notebook>($"api/notebook/{NbId}");
+            //dOpts = new Dictionary<string, ShowEncryptedOptions>();
+            //recs = new Dictionary<string, Record>();
         }
         catch
         {
