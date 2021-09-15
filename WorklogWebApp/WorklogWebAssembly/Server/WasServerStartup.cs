@@ -15,6 +15,7 @@ using WorklogStorage;
 using WorklogStorage.InMemoryStorage;
 using WorklogStorage.MongoDb;
 using WorklogWebApp.Exceptions;
+using WorklogWebAssembly.Server.Svc;
 
 namespace WorklogWebAssembly.Server
 {
@@ -51,7 +52,8 @@ namespace WorklogWebAssembly.Server
                 {"mongo", mongoDbStorage}
             };
             var storageType = Configuration.GetValue("StorageType", "local");
-            services.AddSingleton(storages.ContainsKey(storageType) ? storages[storageType]() : storages["local"]());        
+            services.AddSingleton(storages.ContainsKey(storageType) ? storages[storageType]() : storages["local"]());
+            services.AddSingleton(new StartupInfo());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
