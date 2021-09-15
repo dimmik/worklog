@@ -22,7 +22,7 @@ namespace WorklogWebAssembly.Server.Controllers
         [HttpGet("start")]
         public DateTimeOffset GetStartupTime()
         {
-            return startupInfo.StartTime;
+            return startupInfo.StartTime.ToOffset(TimeSpan.FromHours(3));
         }
     }
 }
