@@ -27,9 +27,9 @@ namespace WorklogWebAssembly.Server.Controllers
         }
 
         [HttpGet("start")]
-        public DateTimeOffset GetStartupTime()
+        public StartupInfo GetStartupTime()
         {
-            return startupInfo.StartTime.ToOffset(TimeSpan.FromHours(3));
+            return startupInfo;
         }
         private static HttpClient client = new() { Timeout = TimeSpan.FromMinutes(10) };
         [HttpGet("wakeup/{code}")]
@@ -37,6 +37,7 @@ namespace WorklogWebAssembly.Server.Controllers
         {
             var secretCode = Configuration.GetValue("WakeupCode", "secCode");
             if (code != secretCode) return "wrong code";
+            startupInfo.LastWakeup = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
             Logger.LogInformation($"{DateTimeOffset.Now}: Wakeup");
             // wait xxx min
             var delay = Configuration.GetValue("WaketimePreDelayInMin", 1);
