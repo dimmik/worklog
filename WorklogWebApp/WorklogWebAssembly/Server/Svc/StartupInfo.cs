@@ -7,7 +7,7 @@ namespace WorklogWebAssembly.Server.Svc
 {
     public class StartupInfo
     {
-        public readonly DateTimeOffset StartTime = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
-        public DateTimeOffset LastWakeup = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
+        public DateTimeOffset StartTime { get; set; } = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
+        public DateTimeOffset LastWakeup { get; set; } = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
     }
 }
