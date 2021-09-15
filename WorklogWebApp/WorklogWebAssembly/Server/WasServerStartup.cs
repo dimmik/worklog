@@ -57,6 +57,24 @@ namespace WorklogWebAssembly.Server
             var storageType = Configuration.GetValue("StorageType", "local");
             services.AddSingleton(storages.ContainsKey(storageType) ? storages[storageType]() : storages["local"]());
             services.AddSingleton(new StartupInfo());
+
+
+            services.AddCors(
+                options => {
+                    options.AddPolicy("mypolicy",
+                        builder => builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(hostName => true));
+                    options.AddDefaultPolicy(builder => builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(hostName => true));
+                }
+            );
+
             WakeupThread();
 
         }
