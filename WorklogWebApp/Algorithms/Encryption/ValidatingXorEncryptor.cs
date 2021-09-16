@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Algorithms.Encryption
@@ -16,7 +17,8 @@ namespace Algorithms.Encryption
             var keyBytes = Encoding.UTF8.GetBytes(effectiveKey);
             byte[] encrytedBytes = Convert.FromBase64String(b64);
             var decryptedBytes = EncryptorUtils.Xor(keyBytes, encrytedBytes);
-            var str = Encoding.UTF8.GetString(decryptedBytes);
+            byte numberOfRandomBytes = decryptedBytes[0];
+            var str = Encoding.UTF8.GetString(decryptedBytes.Skip(numberOfRandomBytes + 1).ToArray());
             return str;
         }
 
@@ -35,7 +37,10 @@ namespace Algorithms.Encryption
 
         public string EncryptAndReturnB64(string key, string plaintextContent)
         {
-            var textBytes = Encoding.UTF8.GetBytes(plaintextContent);
+            byte numberOfRandomBytes = (byte)r.Next(8, 37);
+            byte[] randBytes = new byte[numberOfRandomBytes];
+            r.NextBytes(randBytes);
+            var textBytes = new[] { numberOfRandomBytes }.Concat(randBytes).Concat(Encoding.UTF8.GetBytes(plaintextContent)).ToArray();
             string salt = GenerateSalt();
             string saltedKeyMd5 = GetSaltedKeyMd5(key, salt);
             string effectiveKey = GetEffectiveKey(key, saltedKeyMd5);
@@ -47,7 +52,9 @@ namespace Algorithms.Encryption
 
         private static string GetEffectiveKey(string key, string saltedKeyMd5)
         {
-            return $"{saltedKeyMd5}:{key}";
+            string shuffledKey = Convert.ToBase64String(EncryptorUtils.Xor(saltedKeyMd5, key));
+            var keyWithSaltedMd5 = $"{shuffledKey}:{saltedKeyMd5}";
+            return keyWithSaltedMd5;
         }
 
         private static string GetSaltedKeyMd5(string key, string salt)

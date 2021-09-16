@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using WorklogDomain;
 using WorklogStorage;
 using WorklogStorage.InMemoryStorage;
@@ -13,12 +14,12 @@ namespace ConsoleTest
     {
         static void Main()
         {
-            string key = "my awesome key";
-            string text = File.ReadAllText("./test-inmem-nbs.json");
-            var enc = new ValidatingXorEncryptor();
-            var encrypted = enc.EncryptAndReturnB64(key, text);
+            byte[] text = Encoding.UTF8.GetBytes("Странная короткая шифрованная запись");
+            //sDlryuB/pZprDQ==#CB1188662EABCFB7EE3964EC30C06A2F#k+Pgs+m45obi+JH/k/aTuGWViemI5cWTjeHB4IyRgpe18GtYa2lfVVagAAoACQE/8GxRbFJhUV+QAAoADQABAAHxUWZc
 
-            var decr = enc.DecryptFromB64(key, encrypted);
+            byte[] encr = Convert.FromBase64String("k+Pgs+m45obi+JH/k/aTuGWViemI5cWTjeHB4IyRgpe18GtYa2lfVVagAAoACQE/8GxRbFJhUV+QAAoADQABAAHxUWZc");
+            var res = Encoding.UTF8.GetString(EncryptorUtils.Xor(text, encr));
+            var rr = EncryptorUtils.Xor(null, "ddd");
         }
         static void Mainxx()
         {
