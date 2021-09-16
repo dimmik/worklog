@@ -62,7 +62,10 @@ else
                                                      TagsToFilter = TagsToFilter.Concat(new[] { e.Value.ToString() }).Distinct().ToList();
                                              }">
                         <option value="">choose tag...</option>
-                        @foreach (var t in (notebook.Records ?? new List<Record>()).SelectMany(r => (r.Metadata?.Tags ?? new List<string>())).Distinct())
+                        @foreach (var t in (notebook.Records ?? new List<Record>())
+                            .Where(r => ShowCompleted || !r.Metadata.Completed)
+                            .SelectMany(r => (r.Metadata?.Tags ?? new List<string>()))
+                            .Distinct())
                         {
                             <option value="@t">@t</option>
                         }
@@ -98,7 +101,7 @@ else
 
                     </span>
                 </td>
-                <td style="width: 95%; vertical-align: top; @(r.Metadata.Completed ? "text-decoration: line-through; background-color: lightgrey;" : "")">
+                <td style="width: 95%; vertical-align: top; @(r.Metadata.Completed ? "background-color: lightgrey;" : "")">
                     <div style="width: 100%; font-size: xx-small; color: grey;">
                         @foreach (var t in (r.Metadata?.Tags ?? new List<string>()))
                         {
@@ -106,6 +109,7 @@ else
                                  @onclick="() => TagsToFilter = TagsToFilter.Concat(new[] { t }).Distinct().ToList()"
                                  ><u>@t</u></i>, </span>
                         }
+                        | <span style="cursor: pointer;" @onclick='() => Tags = string.Join(", ", (r.Metadata?.Tags ?? new List<string>()))'>----</span>
                     </div>
                     <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word;">
                         <!--((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true })))-->
