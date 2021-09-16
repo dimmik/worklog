@@ -9,7 +9,6 @@ namespace Algorithms.Encryption
     {
         private readonly Random r = new Random((int)(DateTimeOffset.Now.Ticks % int.MaxValue));
         public int SaltSize { get; set; } = 10;
-        public int RandomPreBytes { get; set; } = 17;
         public string EncryptedDelimiter { get; set; } = "#";
         public string DecryptFromB64(string key, string encryptedB64Content)
         {
@@ -18,7 +17,8 @@ namespace Algorithms.Encryption
             var keyBytes = Encoding.UTF8.GetBytes(effectiveKey);
             byte[] encrytedBytes = Convert.FromBase64String(b64);
             var decryptedBytes = EncryptorUtils.Xor(keyBytes, encrytedBytes);
-            var str = Encoding.UTF8.GetString(decryptedBytes.Skip(RandomPreBytes).ToArray());
+            byte numberOfRandomBytes = decryptedBytes[0];
+            var str = Encoding.UTF8.GetString(decryptedBytes.Skip(numberOfRandomBytes + 1).ToArray());
             return str;
         }
 
@@ -37,9 +37,10 @@ namespace Algorithms.Encryption
 
         public string EncryptAndReturnB64(string key, string plaintextContent)
         {
-            byte[] randBytes = new byte[RandomPreBytes];
+            byte numberOfRandomBytes = (byte)r.Next(8, 37);
+            byte[] randBytes = new byte[numberOfRandomBytes];
             r.NextBytes(randBytes);
-            var textBytes = randBytes.Concat(Encoding.UTF8.GetBytes(plaintextContent)).ToArray();
+            var textBytes = new[] { numberOfRandomBytes }.Concat(randBytes).Concat(Encoding.UTF8.GetBytes(plaintextContent)).ToArray();
             string salt = GenerateSalt();
             string saltedKeyMd5 = GetSaltedKeyMd5(key, salt);
             string effectiveKey = GetEffectiveKey(key, saltedKeyMd5);
