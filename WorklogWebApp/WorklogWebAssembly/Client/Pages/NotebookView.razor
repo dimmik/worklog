@@ -44,10 +44,30 @@ else
                     last records out of @((notebook.Records ?? new List<Record>()).Count())
                     |
                     completed: <input type="checkbox" checked="@ShowCompleted" @onclick="() => ShowCompleted = !ShowCompleted"/>
+                    @if (TagsToFilter.Any())
+                    {
+                        <span>
+                            |
+                            @foreach (var t in TagsToFilter.OrderBy(t => t))
+                            {
+                                <span><i style="cursor:pointer" @onclick="() => TagsToFilter.Remove(t)"><u>@t</u></i>, </span>
+                            }
+                            <input type="checkbox" @bind="TagFilterAny"/> any
+                        </span>
+                    }
                 </span>
             </td>
         </tr>
-        @foreach (var r in ((notebook.Records ?? new List<Record>()).Where(r => ShowCompleted || !r.Metadata.Completed).OrderBy(r => r.Timestamp).TakeLast(NumLastRecords)))
+        @foreach (var r in 
+            ((notebook.Records ?? new List<Record>())
+            .Where(r => ShowCompleted || !r.Metadata.Completed)
+            .Where(r => 
+                !TagsToFilter.Any() || 
+                    (TagFilterAny && (r.Metadata?.Tags ?? new List<string>()).Intersect(TagsToFilter).Any()) ||
+                    (!TagFilterAny && (r.Metadata?.Tags ?? new List<string>()).Intersect(TagsToFilter).Count() == TagsToFilter.Count())
+            )
+            .OrderBy(r => r.Timestamp)
+            .TakeLast(NumLastRecords)))
         {
             var rId = r.Id;
 
@@ -58,6 +78,7 @@ else
                 <td style="width: 5%" valign="top" align="center">
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
+
                         <span id="@rId"
                               style="        
         border: 1px solid black;
@@ -72,7 +93,15 @@ else
 
                     </span>
                 </td>
-                <td style="width: 95%; @(r.Metadata.Completed ? "text-decoration: line-through; background-color: lightgrey;" : "")">
+                <td style="width: 95%; vertical-align: top; @(r.Metadata.Completed ? "text-decoration: line-through; background-color: lightgrey;" : "")">
+                    <div style="width: 100%; font-size: xx-small; color: grey;">
+                        @foreach (var t in (r.Metadata?.Tags ?? new List<string>()))
+                        {
+                        <span><i style="cursor:pointer"
+                                 @onclick="() => TagsToFilter = TagsToFilter.Concat(new[] { t }).Distinct().ToList()"
+                                 ><u>@t</u></i>, </span>
+                        }
+                    </div>
                     <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word;">
                         <!--((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true })))-->
                         @if (!r.Metadata.Encrypted)
@@ -115,6 +144,7 @@ else
                 <span style="font-size:x-small">
                     <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent" /> Encrypt
                     Key: <input type="password" id="enckey" @bind-value="EncryptionKey" />
+                    | Tags (a,b,c): <input type="text" @bind-value="Tags"/>
                 </span>
                 <button @onclick="AddRecord">Add</button>
             </td>
@@ -144,6 +174,10 @@ else
     protected UserSettings userSettings;
 
     protected bool ShowTextRefreshed = false;
+    protected List<string> TagsToFilter = new List<string>();
+    protected bool TagFilterAny = true;
+
+    protected string Tags { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -152,6 +186,7 @@ else
         NumLastRecords = userSettings.DefaultRecordsToShow;
         ShowCompleted = userSettings.ShowCompleted;
         EncryptionKey = userSettings.DefaultShowEncryptedOptions.key;
+        Tags = (await AppState.Retrieve<string>($"CurrentTagsForNb_{notebook.Id}")) ?? "";
     }
 
 
@@ -208,7 +243,6 @@ else
         if (int.TryParse(numS, out int num))
         {
             NumLastRecords = num;
-            //await AppState.Store(nameof(NumLastRecords), NumLastRecords);
         }
     }
     protected async Task AddRecordByEnter(KeyboardEventArgs e)
@@ -231,6 +265,12 @@ else
         {
             rec.Content = NewRecordContent;
         }
+        if (!string.IsNullOrWhiteSpace(Tags))
+        {
+            rec.Metadata.Tags = Tags.Split(',').ToList();
+            await AppState.Store<string>($"CurrentTagsForNb_{notebook.Id}", Tags);
+        }
+
         await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", rec);
         NewRecordContent = "";
         await ReloadNotebook();
