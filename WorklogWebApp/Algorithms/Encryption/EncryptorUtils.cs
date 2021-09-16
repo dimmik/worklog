@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Algorithms.Encryption
 {
-    static class EncryptorUtils
+    public static class EncryptorUtils
     {
         public static byte[] Xor(byte[] keyBytes, byte[] textBytes)
         {
