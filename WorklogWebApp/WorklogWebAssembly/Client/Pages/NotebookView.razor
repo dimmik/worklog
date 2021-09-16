@@ -23,7 +23,22 @@ else
         <tr>
             <td colspan="2">
                 <b>@notebook.Name</b> <span style="font-size:xx-small">[@notebook.Created.ToString("yyyy-MM-dd HH:mm:ss")]</span> 
-                <span class="button small-btn" style="cursor:pointer" @onclick="ReloadNotebook">Refresh</span><br />
+                
+                <span class="button small-btn" @onclick="async () => {
+                                                             await ReloadNotebook();
+                                                             ShowTextRefreshed = true;
+                                                             var timer = new System.Threading.Timer((_) =>
+                                                                {
+                                                                    InvokeAsync(() =>
+                                                                    {
+                                                                        ShowTextRefreshed = false;
+                                                                        StateHasChanged();
+                                                                    });
+                                                                }, null, 500, System.Threading.Timeout.Infinite);
+                                                         }">Refresh</span> <span style="@(ShowTextRefreshed ? "" : "visibility:hidden")">refreshed</span>
+
+                <br />
+                
                 <span style="font-size:x-small">
                     Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" />
                     last records out of @((notebook.Records ?? new List<Record>()).Count())
@@ -121,6 +136,8 @@ else
 
 
     protected UserSettings userSettings;
+
+    protected bool ShowTextRefreshed = false;
 
     protected override async Task OnInitializedAsync()
     {
