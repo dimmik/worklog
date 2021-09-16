@@ -43,18 +43,32 @@ else
                     Show <input type="text" size="3" value="@NumLastRecords" @onchange="@((ChangeEventArgs __e) => ChangedNumLastRecords(__e.Value.ToString()))" />
                     last records out of @((notebook.Records ?? new List<Record>()).Count())
                     |
-                    completed: <input type="checkbox" checked="@ShowCompleted" @onclick="() => ShowCompleted = !ShowCompleted"/>
+                    completed: <input type="checkbox" checked="@ShowCompleted" @onclick="() => ShowCompleted = !ShowCompleted" />
+                    |
                     @if (TagsToFilter.Any())
                     {
                         <span>
-                            |
                             @foreach (var t in TagsToFilter.OrderBy(t => t))
                             {
                                 <span><i style="cursor:pointer" @onclick="() => TagsToFilter.Remove(t)"><u>@t</u></i>, </span>
                             }
-                            <input type="checkbox" @bind="TagFilterAny"/> any
+                            <input type="checkbox" @bind="TagFilterAny" /> any
                         </span>
                     }
+
+
+                    <select @onchange="(ChangeEventArgs e) => {
+                                                 if (!string.IsNullOrWhiteSpace(e.Value.ToString()))
+                                                     TagsToFilter = TagsToFilter.Concat(new[] { e.Value.ToString() }).Distinct().ToList();
+                                             }">
+                        <option value="">choose tag...</option>
+                        @foreach (var t in (notebook.Records ?? new List<Record>()).SelectMany(r => (r.Metadata?.Tags ?? new List<string>())).Distinct())
+                        {
+                            <option value="@t">@t</option>
+                        }
+                    </select>
+
+
                 </span>
             </td>
         </tr>
