@@ -59,15 +59,21 @@ else
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
                         <span id="@rId"
-                              style="border: 1px solid black; background-color: @(recs[rId].Metadata.Completed ? "lightblue" : "white"); color: @(recs[rId].Metadata.Completed ? "lightblue" : "white"); cursor: pointer; font-size: small"
+                              style="        
+        border: 1px solid black;
+        font-family: monospace;
+        background-color: @(recs[rId].Metadata.Completed ? "lightblue" : "white");
+        color: @(recs[rId].Metadata.Completed ? "black" : "white");
+        cursor: pointer;
+        font-size: x-small"
                               @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }">
-                            O
+                            &nbsp;V&nbsp;
                         </span>
 
                     </span>
                 </td>
-                <td style="width: 95%">
-                    <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word; @(r.Metadata.Completed ? "text-decoration: line-through" : "")">
+                <td style="width: 95%; @(r.Metadata.Completed ? "text-decoration: line-through; background-color: lightgrey;" : "")">
+                    <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word;">
                         <!--((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true })))-->
                         @if (!r.Metadata.Encrypted)
                         {
