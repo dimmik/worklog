@@ -92,18 +92,9 @@ else
                 <td style="width: 5%" valign="top" align="center">
                     <span style="font-size: xx-small">
                         <nobr>@r.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</nobr>
-
-                        <span id="@rId"
-                              style="        
-        border: 1px solid black;
-        font-family: monospace;
-        background-color: @(recs[rId].Metadata.Completed ? "lightblue" : "white");
-        color: @(recs[rId].Metadata.Completed ? "black" : "white");
-        cursor: pointer;
-        font-size: x-small"
-                              @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }">
-                            &nbsp;V&nbsp;
-                        </span>
+                       
+                        <input type="checkbox" @key="@rId" checked="@recs[rId].Metadata.Completed"
+                               @onclick="async () => { recs[rId].Metadata.Completed = !recs[rId].Metadata.Completed; await UpdateRecord(recs[rId]); }"/>
 
                     </span>
                 </td>
