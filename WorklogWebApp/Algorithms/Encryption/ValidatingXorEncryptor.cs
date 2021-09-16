@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Algorithms.Encryption
@@ -8,6 +9,7 @@ namespace Algorithms.Encryption
     {
         private readonly Random r = new Random((int)(DateTimeOffset.Now.Ticks % int.MaxValue));
         public int SaltSize { get; set; } = 10;
+        public int RandomPreBytes { get; set; } = 17;
         public string EncryptedDelimiter { get; set; } = "#";
         public string DecryptFromB64(string key, string encryptedB64Content)
         {
@@ -16,7 +18,7 @@ namespace Algorithms.Encryption
             var keyBytes = Encoding.UTF8.GetBytes(effectiveKey);
             byte[] encrytedBytes = Convert.FromBase64String(b64);
             var decryptedBytes = EncryptorUtils.Xor(keyBytes, encrytedBytes);
-            var str = Encoding.UTF8.GetString(decryptedBytes);
+            var str = Encoding.UTF8.GetString(decryptedBytes.Skip(RandomPreBytes).ToArray());
             return str;
         }
 
@@ -35,7 +37,9 @@ namespace Algorithms.Encryption
 
         public string EncryptAndReturnB64(string key, string plaintextContent)
         {
-            var textBytes = Encoding.UTF8.GetBytes(plaintextContent);
+            byte[] randBytes = new byte[RandomPreBytes];
+            r.NextBytes(randBytes);
+            var textBytes = randBytes.Concat(Encoding.UTF8.GetBytes(plaintextContent)).ToArray();
             string salt = GenerateSalt();
             string saltedKeyMd5 = GetSaltedKeyMd5(key, salt);
             string effectiveKey = GetEffectiveKey(key, saltedKeyMd5);
@@ -47,7 +51,9 @@ namespace Algorithms.Encryption
 
         private static string GetEffectiveKey(string key, string saltedKeyMd5)
         {
-            return $"{saltedKeyMd5}:{key}";
+            string shuffledKey = Convert.ToBase64String(EncryptorUtils.Xor(saltedKeyMd5, key));
+            var keyWithSaltedMd5 = $"{shuffledKey}:{saltedKeyMd5}";
+            return keyWithSaltedMd5;
         }
 
         private static string GetSaltedKeyMd5(string key, string salt)

@@ -19,6 +19,7 @@ namespace ConsoleTest
 
             byte[] encr = Convert.FromBase64String("k+Pgs+m45obi+JH/k/aTuGWViemI5cWTjeHB4IyRgpe18GtYa2lfVVagAAoACQE/8GxRbFJhUV+QAAoADQABAAHxUWZc");
             var res = Encoding.UTF8.GetString(EncryptorUtils.Xor(text, encr));
+            var rr = EncryptorUtils.Xor(null, "ddd");
         }
         static void Mainxx()
         {
