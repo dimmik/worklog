@@ -57,13 +57,9 @@ else
                     }
 
 
-                    <select @onchange="(ChangeEventArgs e) => {
-                                                 if (!string.IsNullOrWhiteSpace(e.Value.ToString()))
-                                                     TagsToFilter = TagsToFilter.Concat(new[] { e.Value.ToString() }).Select(t => t.Trim()).Distinct().ToList();
-                                             }">
-                        <option value="">choose tag...</option>
-                        @foreach (var t in (notebook.Records ?? new List<Record>())
-                            .Where(r => ShowCompleted || !r.Metadata.Completed)
+                    <select @bind="TagSelectedValue">
+                        <option value="" selected="selected">choose tag...</option>
+                        @foreach (var t in RecordsToShow(notebook)
                             .SelectMany(r => (r.Metadata?.Tags ?? new List<string>()))
                             .Select(t => t.Trim())
                             .Distinct())
@@ -77,19 +73,10 @@ else
             </td>
         </tr>
         @foreach (var r in 
-            ((notebook.Records ?? new List<Record>())
-            .Where(r => ShowCompleted || !r.Metadata.Completed)
-            .Where(r => 
-                !TagsToFilter.Any() || 
-                    (TagFilterAny && (r.Metadata?.Tags ?? new List<string>())
-                            .Select(t => t.Trim())
-                            .Intersect(TagsToFilter.Select(t => t.Trim())).Any()) ||
-                    (!TagFilterAny && (r.Metadata?.Tags ?? new List<string>())
-                            .Select(t => t.Trim())
-                            .Intersect(TagsToFilter.Select(t => t.Trim())).Count() == TagsToFilter.Count())
-            )
-            .OrderBy(r => r.Timestamp)
-            .TakeLast(NumLastRecords)))
+                    RecordsToShow(notebook)
+                        .OrderBy(r => r.Timestamp)
+                        .TakeLast(NumLastRecords)
+                        )
         {
             var rId = r.Id;
 
@@ -193,6 +180,27 @@ else
 
     protected string Tags { get; set; }
 
+    private string _tsv = "";
+    protected string TagSelectedValue {
+        get { return _tsv; }
+        set {
+            _tsv = value;
+            if (!string.IsNullOrWhiteSpace(_tsv))
+            {
+                var t = _tsv;
+                TagsToFilter = TagsToFilter.Concat(new[] { t }).Select(t => t.Trim()).Distinct().ToList();
+                var timer = new System.Threading.Timer((_) =>
+                {
+                    InvokeAsync(() =>
+                    {
+                        TagSelectedValue = "";
+                        StateHasChanged();
+                    });
+                }, null, 100, System.Threading.Timeout.Infinite);
+            }
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await ReloadNotebook();
@@ -203,6 +211,25 @@ else
         Tags = (await AppState.Retrieve<string>($"CurrentTagsForNb_{notebook.Id}")) ?? "";
     }
 
+    protected bool MatchTags(Record r)
+    {
+        bool res = !TagsToFilter.Any() ||
+                    (TagFilterAny && (r.Metadata?.Tags ?? new List<string>())
+                            .Select(t => t.Trim())
+                            .Intersect(TagsToFilter.Select(t => t.Trim())).Any()) ||
+                    (!TagFilterAny && (r.Metadata?.Tags ?? new List<string>())
+                            .Select(t => t.Trim())
+                            .Intersect(TagsToFilter.Select(t => t.Trim())).Count() == TagsToFilter.Count());
+        return res;
+    }
+    protected IEnumerable<Record> RecordsToShow(Notebook notebook)
+    {
+        var ret = (notebook?.Records ?? new List<Record>())
+            .Where(r => ShowCompleted || !r.Metadata.Completed)
+            .Where(r => MatchTags(r));
+        return ret;
+
+    }
 
     protected string CleanupAndPrepare(string txt)
     {
