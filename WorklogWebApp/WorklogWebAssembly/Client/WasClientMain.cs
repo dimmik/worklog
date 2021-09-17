@@ -21,7 +21,8 @@ namespace WorklogWebAssembly.Client
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddSingleton<AppState>();
 
-            var enc = new ValidatingXorEncryptor();
+//            var enc = new ValidatingXorEncryptor();
+            var enc = new AesBasedEncryptor();
             builder.Services.AddSingleton<ISymmetricEncryptor>(enc);
 
             await builder.Build().RunAsync();

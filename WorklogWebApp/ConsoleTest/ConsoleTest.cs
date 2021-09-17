@@ -14,12 +14,11 @@ namespace ConsoleTest
     {
         static void Main()
         {
-            byte[] text = Encoding.UTF8.GetBytes("Странная короткая шифрованная запись");
-            //sDlryuB/pZprDQ==#CB1188662EABCFB7EE3964EC30C06A2F#k+Pgs+m45obi+JH/k/aTuGWViemI5cWTjeHB4IyRgpe18GtYa2lfVVagAAoACQE/8GxRbFJhUV+QAAoADQABAAHxUWZc
-
-            byte[] encr = Convert.FromBase64String("k+Pgs+m45obi+JH/k/aTuGWViemI5cWTjeHB4IyRgpe18GtYa2lfVVagAAoACQE/8GxRbFJhUV+QAAoADQABAAHxUWZc");
-            var res = Encoding.UTF8.GetString(EncryptorUtils.Xor(text, encr));
-            var rr = EncryptorUtils.Xor(null, "ddd");
+            string text = "какой-то там текст для шифрования";
+            string key = "блин ну ключ же";
+            AesBasedEncryptor enc = new();
+            var encr = enc.EncryptAndReturnB64(key, text);
+            var decr = enc.DecryptFromB64("блин ну ключ же", encr);
         }
         static void Mainxx()
         {
