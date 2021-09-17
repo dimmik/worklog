@@ -59,12 +59,13 @@ else
 
                     <select @onchange="(ChangeEventArgs e) => {
                                                  if (!string.IsNullOrWhiteSpace(e.Value.ToString()))
-                                                     TagsToFilter = TagsToFilter.Concat(new[] { e.Value.ToString() }).Distinct().ToList();
+                                                     TagsToFilter = TagsToFilter.Concat(new[] { e.Value.ToString() }).Select(t => t.Trim()).Distinct().ToList();
                                              }">
                         <option value="">choose tag...</option>
                         @foreach (var t in (notebook.Records ?? new List<Record>())
                             .Where(r => ShowCompleted || !r.Metadata.Completed)
                             .SelectMany(r => (r.Metadata?.Tags ?? new List<string>()))
+                            .Select(t => t.Trim())
                             .Distinct())
                         {
                             <option value="@t">@t</option>
@@ -80,8 +81,12 @@ else
             .Where(r => ShowCompleted || !r.Metadata.Completed)
             .Where(r => 
                 !TagsToFilter.Any() || 
-                    (TagFilterAny && (r.Metadata?.Tags ?? new List<string>()).Intersect(TagsToFilter).Any()) ||
-                    (!TagFilterAny && (r.Metadata?.Tags ?? new List<string>()).Intersect(TagsToFilter).Count() == TagsToFilter.Count())
+                    (TagFilterAny && (r.Metadata?.Tags ?? new List<string>())
+                            .Select(t => t.Trim())
+                            .Intersect(TagsToFilter.Select(t => t.Trim())).Any()) ||
+                    (!TagFilterAny && (r.Metadata?.Tags ?? new List<string>())
+                            .Select(t => t.Trim())
+                            .Intersect(TagsToFilter.Select(t => t.Trim())).Count() == TagsToFilter.Count())
             )
             .OrderBy(r => r.Timestamp)
             .TakeLast(NumLastRecords)))
@@ -106,7 +111,7 @@ else
                         @foreach (var t in (r.Metadata?.Tags ?? new List<string>()))
                         {
                         <span><i style="cursor:pointer"
-                                 @onclick="() => TagsToFilter = TagsToFilter.Concat(new[] { t }).Distinct().ToList()"
+                                 @onclick="() => TagsToFilter = TagsToFilter.Concat(new[] { t }).Select(t => t.Trim()).Distinct().ToList()"
                                  ><u>@t</u></i>, </span>
                         }
                         | <span style="cursor: pointer;" @onclick='() => Tags = string.Join(", ", (r.Metadata?.Tags ?? new List<string>()))'>----</span>
@@ -276,8 +281,11 @@ else
         }
         if (!string.IsNullOrWhiteSpace(Tags))
         {
-            rec.Metadata.Tags = Tags.Split(',').ToList();
-            await AppState.Store<string>($"CurrentTagsForNb_{notebook.Id}", Tags);
+            rec.Metadata.Tags = Tags
+                .Split(',')
+                .Select(t => t.Trim())
+                .ToList();
+            await AppState.Store<string>($"CurrentTagsForNb_{notebook.Id}", string.Join(", ", rec.Metadata.Tags));
         }
 
         await Http.PostAsJsonAsync($"api/notebook/{NbId}/record", rec);
