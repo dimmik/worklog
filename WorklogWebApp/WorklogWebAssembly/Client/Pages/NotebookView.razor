@@ -74,8 +74,9 @@ else
         </tr>
         @foreach (var r in 
                     RecordsToShow(notebook)
-                        .OrderBy(r => r.Timestamp)
-                        .TakeLast(NumLastRecords)
+                    .Where(r => MatchTags(r))
+                    .OrderBy(r => r.Timestamp)
+                    .TakeLast(NumLastRecords)
                         )
         {
             var rId = r.Id;
@@ -225,8 +226,7 @@ else
     protected IEnumerable<Record> RecordsToShow(Notebook notebook)
     {
         var ret = (notebook?.Records ?? new List<Record>())
-            .Where(r => ShowCompleted || !r.Metadata.Completed)
-            .Where(r => MatchTags(r));
+            .Where(r => ShowCompleted || !r.Metadata.Completed);
         return ret;
 
     }

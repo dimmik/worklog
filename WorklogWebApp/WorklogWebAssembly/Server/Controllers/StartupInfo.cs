@@ -10,6 +10,7 @@ namespace WorklogWebAssembly.Server.Controllers
         public DateTimeOffset StartTime { get; set; } = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(3));
         public List<DateTimeOffset> LastWakeups { get; set; } = new List<DateTimeOffset>();
         public int NumberWakeupsToKeep { get; set; } = 15;
+        public string Uptime => $"{DateTimeOffset.Now - StartTime}";
         public void Wakeup()
         {
             if (LastWakeups.Count >= NumberWakeupsToKeep)
