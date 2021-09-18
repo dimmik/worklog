@@ -1,4 +1,5 @@
 using Algorithms.Encryption;
+using MatBlazor;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,8 @@ namespace WorklogWebAssembly.Client
 //            var enc = new ValidatingXorEncryptor();
             var enc = new AesBasedEncryptor();
             builder.Services.AddSingleton<ISymmetricEncryptor>(enc);
+
+            builder.Services.AddMatBlazor();
 
             await builder.Build().RunAsync();
         }
