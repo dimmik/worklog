@@ -102,7 +102,13 @@ else
                                  @onclick="() => TagsToFilter = TagsToFilter.Concat(new[] { t }).Select(t => t.Trim()).Distinct().ToList()"
                                  ><u>@t</u></i>, </span>
                         }
-                        | <span style="cursor: pointer;" @onclick='() => Tags = string.Join(", ", (r.Metadata?.Tags ?? new List<string>()))'>----</span>
+                        | <span @key="@("cpt"+r.Id)" 
+                                style="cursor: pointer; @(TagsCopiedFrom == r.Id ? "border: 1px solid; background-color: lightblue;" : "")" 
+                                @onclick='() =>
+                                          {
+                                              Tags = string.Join(", ", (r.Metadata?.Tags ?? new List<string>()));
+                                              TagsCopiedFrom = r.Id;
+                                          }'>----</span>
                     </div>
                     <div style="width: 100%; text-overflow: ellipsis; word-wrap: break-word;">
                         <!--((MarkupString)CleanupAndPrepare(JsonSerializer.Serialize(r.Metadata, new JsonSerializerOptions() { WriteIndented = true })))-->
@@ -180,6 +186,7 @@ else
     protected bool TagFilterAny = true;
 
     protected string Tags { get; set; }
+    private string TagsCopiedFrom = "";
 
     private string _tsv = "";
     protected string TagSelectedValue {
