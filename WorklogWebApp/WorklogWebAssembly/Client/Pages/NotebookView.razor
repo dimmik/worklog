@@ -53,6 +53,13 @@ else
                                 <span><i style="cursor:pointer" @onclick="() => TagsToFilter.Remove(t)"><u>@t</u></i>, </span>
                             }
                             <input type="checkbox" @bind="TagFilterAny" /> any
+                            | <span @key="@("cpttop")"
+                                style="cursor: pointer; @(TagsCopiedFrom == "TopOfTable" ? "border: 1px solid; background-color: lightblue;" : "")"
+                                    @onclick='() =>
+                                          {
+                                              Tags = string.Join(", ", (TagsToFilter ?? new List<string>()));
+                                              TagsCopiedFrom = "TopOfTable";
+                                          }'>----</span>
                         </span>
                     }
 
@@ -216,7 +223,7 @@ else
         NumLastRecords = userSettings.DefaultRecordsToShow;
         ShowCompleted = userSettings.ShowCompleted;
         EncryptionKey = userSettings.DefaultShowEncryptedOptions.key;
-        Tags = (await AppState.Retrieve<string>($"CurrentTagsForNb_{notebook.Id}")) ?? "";
+        Tags = (await AppState.Retrieve<string>($"CurrentTagsForNb_{notebook?.Id ?? "na"}")) ?? "";
     }
 
     protected bool MatchTags(Record r)
