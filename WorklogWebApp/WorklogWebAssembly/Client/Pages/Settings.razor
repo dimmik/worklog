@@ -27,6 +27,14 @@ else
             <button @onclick="() => showKey = !showKey">@(showKey ? "Hide" : "Show")</button></li>
         </ol>
     </li>
+    <li>
+        Collapse Records defaults
+        <ol>
+            <li>Colapse text: <input type="checkbox" checked="@userSettings.Collapse.Collapse"
+                    @onclick="() => userSettings.Collapse.Collapse = !userSettings.Collapse.Collapse"></li>
+            <li>Length: <input type="text" @bind-value="userSettings.Collapse.Length" /></li>
+        </ol>
+    </li>
     <li><button @onclick="StoreUserSettings">Save</button>
     <span style="visibility: @(IsSaved ? "visible" : "hidden")">Saved</span>
     </li>
