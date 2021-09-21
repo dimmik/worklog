@@ -3,6 +3,7 @@
 @using Algorithms.Encryption
 @using WorklogWebAssembly.Client.Data
 @using System.Text.Json
+@using System.Threading 
 @inject HttpClient Http
 @inject AppState AppState
 @inject ISymmetricEncryptor enc
@@ -27,7 +28,7 @@ else
                 <MatButton class="button small-btn" @onclick="async () => {
                                                              await ReloadNotebook();
                                                              ShowTextRefreshed = true;
-                                                             var timer = new System.Threading.Timer((_) =>
+                                                             var timer = new Timer((_) =>
                                                                 {
                                                                     InvokeAsync(() =>
                                                                     {
@@ -236,7 +237,7 @@ else
             }
         }
     }
-
+    private Timer resizeTimer;
     protected override async Task OnInitializedAsync()
     {
         await ReloadNotebook();
@@ -245,6 +246,22 @@ else
         ShowCompleted = userSettings.ShowCompleted;
         EncryptionKey = userSettings.DefaultShowEncryptedOptions.key;
         Tags = (await AppState.Retrieve<string>($"CurrentTagsForNb_{notebook?.Id ?? "na"}")) ?? "";
+        resizeTimer = new Timer((_) =>
+        {
+            InvokeAsync(async () =>
+            {
+                await ResizeTextArea();
+            });
+        }, null, 1000, 300);
+    }
+
+    private async Task ResizeTextArea()
+    {
+        await JsRuntime.InvokeAsync<object>("eval", @"(function() {
+            NewRecordContent.style.height='auto';
+            NewRecordContent.style.height=(NewRecordContent.scrollHeight + 10)+'px';
+            //return MyTextArea.scrollHeight;
+        })()");
     }
 
     protected bool MatchTags(Record r)
