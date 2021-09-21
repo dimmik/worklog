@@ -172,7 +172,7 @@ else
         }
         <tr>
             <td colspan="2">
-                <!--h:  @(HGHT)<hr/-->
+                h:  @(HGHT)<hr/>
                 <textarea id="NewRecordContent" style="width: 100%"
                           @bind="NewRecordContent"
                           @bind:event="oninput"
@@ -274,10 +274,9 @@ else
         if (NewRecordContentChanged)
         {
             var res = await JsRuntime.InvokeAsync<object>("eval", @"(function() {
-            hgt = (NewRecordContent.scrollHeight)+'px'
-            if (hgt != NewRecordContent.style.height){
+            if (NewRecordContent.scrollHeight < 600) {
                 NewRecordContent.style.height='auto';
-                NewRecordContent.style.height=(NewRecordContent.scrollHeight)+'px';
+                NewRecordContent.style.height=(NewRecordContent.scrollHeight + 5)+'px';
             }
             return NewRecordContent.scrollHeight;
                 })()");
