@@ -172,6 +172,7 @@ else
         }
         <tr>
             <td colspan="2">
+                <!--h:  @(HGHT)<hr/-->
                 <textarea id="NewRecordContent" style="width: 100%"
                           @bind="NewRecordContent"
                           @bind:event="oninput"
@@ -180,7 +181,8 @@ else
                 <span style="font-size:x-small">
                     <input type="checkbox" id="encrypt" checked="@EncryptContent" @onclick="() => EncryptContent = !EncryptContent" /> Encrypt
                     Key: <input type="password" id="enckey" @bind-value="EncryptionKey" />
-                    | Tags (a,b,c): <input type="text" @bind-value="Tags"/>
+                    | Tags (a,b,c): <input type="text" @bind-value="Tags" />
+
                 </span>
                 <button @onclick="AddRecord">Add</button>
             </td>
@@ -196,8 +198,20 @@ else
     protected int NumLastRecords { get; set; }
     protected bool ShowCompleted { get; set; }
 
-
-    protected string NewRecordContent = "";
+    private string __n_r_c = "";
+    private bool NewRecordContentChanged = false;
+    protected string NewRecordContent {
+        get
+        {
+            return __n_r_c;
+        }
+        set
+        {
+            __n_r_c = value;
+            NewRecordContentChanged = true;
+        }
+    }
+    protected string HGHT = "";
     private ElementReference NewRecordContentElem;
 
     private bool EncryptContent = false;
@@ -257,11 +271,19 @@ else
 
     private async Task ResizeTextArea()
     {
-        await JsRuntime.InvokeAsync<object>("eval", @"(function() {
-            NewRecordContent.style.height='auto';
-            NewRecordContent.style.height=(NewRecordContent.scrollHeight + 10)+'px';
-            //return MyTextArea.scrollHeight;
-        })()");
+        if (NewRecordContentChanged)
+        {
+            var res = await JsRuntime.InvokeAsync<object>("eval", @"(function() {
+            hgt = (NewRecordContent.scrollHeight)+'px'
+            if (hgt != NewRecordContent.style.height){
+                NewRecordContent.style.height='auto';
+                NewRecordContent.style.height=(NewRecordContent.scrollHeight)+'px';
+            }
+            return NewRecordContent.scrollHeight;
+                })()");
+            HGHT = res.ToString();
+            NewRecordContentChanged = false;
+        }
     }
 
     protected bool MatchTags(Record r)
