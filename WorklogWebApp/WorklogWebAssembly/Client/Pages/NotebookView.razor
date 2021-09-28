@@ -75,7 +75,8 @@ else
                             <option value="@t">@t</option>
                         }
                     </select>
-
+                    |
+                    <input style="font-size: xx-small; height: min-content; padding: 0px;" type="text" @bind-value="FilterContent"/>
 
                 </span>
             </td>
@@ -305,12 +306,34 @@ else
                             .Intersect(TagsToFilter.Select(t => t.Trim())).Count() == TagsToFilter.Count());
         return res;
     }
+
+
+    protected DateTimeOffset FilterDateFrom = DateTimeOffset.MinValue;
+    protected DateTimeOffset FilterDateTo = DateTimeOffset.MaxValue;
+    protected string FilterContent = null; //"encr";
+
+
     protected IEnumerable<Record> RecordsToShow(Notebook notebook)
     {
         var ret = (notebook?.Records ?? new List<Record>())
+            // match date
+            .Where(r => r.Timestamp >= FilterDateFrom && r.Timestamp <= FilterDateTo)
+            // match content
+            .Where(r => (string.IsNullOrWhiteSpace(FilterContent) || MatchesContent(r, FilterContent)))
             .Where(r => ShowCompleted || !r.Metadata.Completed);
         return ret;
-
+    }
+    private bool MatchesContent(Record r, string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return true;
+        if (r.Metadata.Encrypted)
+        {
+            var decrypted = Decrypt((dOpts.ContainsKey(r.Id) ? dOpts[r.Id] : userSettings.DefaultShowEncryptedOptions), r.Content);
+            return decrypted.ToLower().Contains(FilterContent.ToLower());
+        } else
+        {
+            return r.Content.ToLower().Contains(FilterContent.ToLower());
+        }
     }
 
     protected string CleanupAndPrepare(string txt, bool collapsed)

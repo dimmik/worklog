@@ -206,6 +206,26 @@
           "Completed": false
         },
         "Content": "dgbdbg"
+      },
+      {
+        "Id": "b25b2c6f988d46cbad8d0acc278c2fe1",
+        "Timestamp": "2021-09-28T19:59:56.614+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [],
+          "Completed": false
+        },
+        "Content": "some strange"
+      },
+      {
+        "Id": "c337d66ec69441119ca764a2734d2479",
+        "Timestamp": "2021-09-28T20:00:06.877+03:00",
+        "Metadata": {
+          "Encrypted": false,
+          "Tags": [],
+          "Completed": false
+        },
+        "Content": "and now something encrypted"
       }
     ]
   },
