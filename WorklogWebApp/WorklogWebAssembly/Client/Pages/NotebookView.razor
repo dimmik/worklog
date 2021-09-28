@@ -75,7 +75,8 @@ else
                             <option value="@t">@t</option>
                         }
                     </select>
-
+                    |
+                    <input style="font-size: xx-small; height: min-content; padding: 0px;" type="text" @bind-value="FilterContent"/>
 
                 </span>
             </td>
@@ -309,7 +310,7 @@ else
 
     protected DateTimeOffset FilterDateFrom = DateTimeOffset.MinValue;
     protected DateTimeOffset FilterDateTo = DateTimeOffset.MaxValue;
-    protected string FilterContent = null;//"encr";
+    protected string FilterContent = null; //"encr";
 
 
     protected IEnumerable<Record> RecordsToShow(Notebook notebook)
