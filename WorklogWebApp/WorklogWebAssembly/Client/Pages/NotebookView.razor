@@ -278,18 +278,21 @@ else
             });
         }, null, 1000, 300);
     }
-
+    const int maxTxAreaHeight = 300;
     private async Task ResizeTextArea()
     {
         if (NewRecordContentChanged)
         {
-            var res = await JsRuntime.InvokeAsync<object>("eval", @"(function() {
-            if (NewRecordContent.scrollHeight < 300) {
-                NewRecordContent.style.height='auto';
-                NewRecordContent.style.height=(NewRecordContent.scrollHeight + 5)+'px';
-            }
-            return NewRecordContent.style.height;
-                })()");
+            var res = await JsRuntime.InvokeAsync<object>("eval", $@"(function() {{
+                    if (NewRecordContent.scrollHeight < {maxTxAreaHeight}) {{
+                        NewRecordContent.style.height='auto';
+                        NewRecordContent.style.height=(NewRecordContent.scrollHeight + 5)+'px';
+                    }} else {{
+                        NewRecordContent.style.height='auto';
+                        NewRecordContent.style.height=({maxTxAreaHeight} + 5)+'px';
+                    }}
+                    return NewRecordContent.style.height;
+                }})()");
             HGHT = res.ToString();
             NewRecordContentChanged = false;
         }
@@ -392,11 +395,19 @@ else
             NumLastRecords = num;
         }
     }
+    private bool ShiftEnterPressed = false;
     protected async Task AddRecordByEnter(KeyboardEventArgs e)
     {
-        if ((e.Code == "Enter" || e.Code == "NumpadEnter") && !(e.AltKey || e.ShiftKey || e.CtrlKey))
+        if (e.Code == "Enter" && (e.AltKey || e.ShiftKey || e.CtrlKey))
+        {
+            // we pressed shift-enter, on next enters - will not add
+            // (scenario: we adding large text, first newline is added with shift-enter, subsecuents - with just enters)
+            ShiftEnterPressed = true;
+        }
+        if ((e.Code == "Enter" || e.Code == "NumpadEnter") && !ShiftEnterPressed)
         {
             await AddRecord();
+            ShiftEnterPressed = false;
         }
     }
     protected async Task AddRecord()
